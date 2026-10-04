@@ -615,6 +615,9 @@
   V.failure.querySelector('button').addEventListener('click',()=>{if(!state.closing){loadScreen(state.screen);layoutViewer();}});
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});dialog.addEventListener('close',cleanup);
   addEventListener('resize',()=>{syncScreens();queueLayout();scheduleRotation();});addEventListener('scroll',()=>{if(!dialog.open)queueLayout();},{passive:true});addEventListener('load',queueLayout);document.fonts?.ready.then(queueLayout);
+  // Content changes can move a device without resizing the device itself.
+  const pageContent=document.querySelector('main');
+  if(pageContent)new ResizeObserver(queueLayout).observe(pageContent);
   let parentScrollTimer;
   addEventListener('scroll',()=>{
     if(dialog.open||!compactPreview())return;

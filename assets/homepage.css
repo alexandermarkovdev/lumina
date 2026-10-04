@@ -11,7 +11,7 @@
 .lm-main .lv-tabs--chips .lv-tab{font-size:12px;min-height:42px}
 .lm-main .lv-tab-panel li{font-size:12px}
 .lm-main .lv-tabs--chips .lv-tab-panel{min-height:190px;margin-top:10px}
-.lm-business-list{display:grid;gap:23px;margin-top:32px}
+.lm-business-list{display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:23px;margin-top:32px;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#a49c8e transparent;overflow-anchor:none}
 .lm-business summary{display:flex;align-items:start;justify-content:space-between;gap:18px;list-style:none;cursor:pointer;padding:4px 0;min-height:48px}
 .lm-business summary::-webkit-details-marker{display:none}
 .lm-business summary>span{display:block;min-width:0}

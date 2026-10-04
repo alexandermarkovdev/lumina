@@ -151,6 +151,16 @@
   function businessExamples(data){
     const host=element('div','lm-business-list');
     const reducedMotion=matchMedia('(prefers-reduced-motion:reduce)');
+    // Reserve the closed list's height. Details scroll inside this region
+    // instead of moving the photographic sections and live monitor below it.
+    const measureList=()=>{
+      if(!host.isConnected)return;
+      const summaries=[...host.querySelectorAll('summary')];
+      const gap=parseFloat(getComputedStyle(host).rowGap)||0;
+      const height=summaries.reduce((sum,node)=>sum+node.getBoundingClientRect().height,0)+gap*Math.max(0,summaries.length-1);
+      if(height>0)host.style.height=Math.ceil(height)+'px';
+    };
+    const listObserver=new ResizeObserver(measureList);
     data.forEach(r=>{
       const item=element('details','lm-business',`<summary><span><strong>${esc(r.title)}</strong><span>${esc(r.summary)}</span></span>${plus}</summary><div class="lm-business-panel"><div class="lm-business-content">${r.body}</div></div>`);item.id=r.id;
       const summary=item.querySelector('summary'),panel=item.querySelector('.lm-business-panel'),content=panel.firstElementChild;
@@ -159,6 +169,13 @@
       function settle(){
         animation?.cancel();animation=null;item.open=expanded;
         panel.style.removeProperty('height');panel.style.removeProperty('opacity');reflect();
+        if(expanded){
+          const bounds=host.getBoundingClientRect(),row=item.getBoundingClientRect();
+          if(row.bottom>bounds.bottom||row.top<bounds.top){
+            const delta=row.height>host.clientHeight?row.top-bounds.top:Math.max(row.bottom-bounds.bottom,Math.min(0,row.top-bounds.top));
+            host.scrollTo({top:host.scrollTop+delta,behavior:reducedMotion.matches?'instant':'smooth'});
+          }
+        }
       }
       function expand(next){
         if(next===expanded&&!animation&&item.open===next)return;
@@ -182,8 +199,10 @@
       // Content can reflow while a phone rotates or a font finishes loading.
       new ResizeObserver(()=>{if(animation)expand(expanded);}).observe(content);
       reducedMotion.addEventListener('change',()=>{if(reducedMotion.matches&&animation)settle();});
-      reflect();controllers.set(r.id,()=>expand(true));host.append(item);
-    });return host;
+      reflect();controllers.set(r.id,()=>expand(true));host.append(item);listObserver.observe(summary);
+    });
+    requestAnimationFrame(measureList);document.fonts?.ready.then(measureList);
+    return host;
   }
   function replace(selector,newNode){const old=$(selector);old.replaceWith(newNode);}
   const surfaces={
