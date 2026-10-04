@@ -36,6 +36,11 @@
 .lm-contact-form .button{border:0;justify-content:center;cursor:pointer}
 .lm-contact-form [role=status],.lm-contact-form .lm-form-help{font:400 12px/1.7 var(--sans);color:var(--muted);margin:0}
 .lm-contact-form[hidden]{display:none}
+.scene-print{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply;fill:#282720}
+.contact-card-print .card-wordmark{font-family:var(--sans);font-size:18px;letter-spacing:3px}
+.contact-card-print .card-phone{font-family:var(--serif);font-size:21px}
+.contact-card-print .card-email{font-family:var(--sans);font-size:12px;letter-spacing:.2px}
+.router-book-print text{font-family:var(--serif);font-size:185px;font-weight:500;fill:#343028;opacity:.92}
 @media(prefers-reduced-motion:reduce){.lm-business summary svg{transition:none}}
 @media(min-width:1201px){
  .lm-main #why .chapter-content,.lm-main #services .chapter-content,.lm-main #businesses .chapter-content{width:42vw;max-width:570px}
@@ -119,11 +124,10 @@
 @media(max-width:359px){.lm-main .landing-copy,.lm-main .chapter{padding-left:20px;padding-right:20px}.lm-main .landing-actions{flex-direction:row}.lm-main .landing-actions .button{width:auto;font-size:10px}.lm-main .lp-showcase-actions{gap:0}.lm-main .lp-hero-link{font-size:11px}}
 
 /* Explicit clipping bounds iframe compositing on mobile WebKit. */
-#projects .lp-device--scene::after{content:"";display:block;position:absolute;left:0;top:98.08%;width:100%;height:5.55%;border-radius:0;background:linear-gradient(105deg,#d7cdc0 0%,#b4a492 55%,#a69683 83%,#bfb09b 100%);clip-path:polygon(0 0,100% 31%,100% 100%,2% 69%,0 48%);pointer-events:none;z-index:0}
 @media(max-width:1000px),(pointer:coarse){.lp-glass,.lp-display{overflow:hidden;contain:paint}.lp-viewer:not([open]) .lp-hardware{box-shadow:none}}
 /* A fine rim remains legible against the pale mobile scene, without a costly blur. */
 @media(max-width:900px){
  .lp-viewer:not([open]) .lp-hardware{outline:1px solid #827c72}
  .lp-viewer .lp-surface.is-scene-screen .lp-glass,.lp-scene-plane{border-radius:14px}
- .lp-viewer .lp-surface.is-scene-screen .lp-glass::after,.lp-scene-plane::after{content:"";position:absolute;inset:0;z-index:2;border:5px solid #c2b7a6;border-bottom-width:9px;border-radius:14px;box-shadow:inset 0 0 0 2px #68675f;pointer-events:none}
+ .lp-viewer .lp-surface.is-scene-screen .lp-glass::after,.lp-scene-plane::after{content:"";position:absolute;inset:0;z-index:2;border:2px solid #68675f;border-radius:14px;pointer-events:none}
 }
