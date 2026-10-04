@@ -1,0 +1,439 @@
+/* Normatec — Спортен комплекс ВСИ
+   All rules are scoped under .nm so they cannot leak into the existing header/footer. */
+
+.nm {
+  --nm-navy: #092e4d;
+  --nm-blue: #087fc0;
+  --nm-blue-hover: #066a9f;
+  --nm-blue-ink: #0670a9;   /* brand blue darkened for small text: 5.4:1 on white */
+  --nm-aqua: #b6edf1;
+  --nm-light: #f0f7fa;
+  --nm-muted: #536b7b;
+  --nm-line: #d8e5ec;
+  --nm-field: #7a93a3;      /* input borders: 3.2:1, enough to see the field */
+  --nm-danger: #b42318;
+  --nm-shadow: 0 1px 2px rgba(9, 46, 77, .05), 0 12px 32px -14px rgba(9, 46, 77, .16);
+  --nm-gutter: 16px;
+
+  display: block;
+  background: #fff;
+  color: var(--nm-navy);
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+.nm *, .nm *::before, .nm *::after { box-sizing: border-box; }
+.nm h1, .nm h2, .nm h3 { margin: 0; font-weight: 800; letter-spacing: -.04em; line-height: 1.08; text-wrap: balance; }
+.nm :where(p, ul, ol, dl, dd, figure) { margin: 0; } /* :where() so the component spacing below can apply */
+.nm svg { flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nm :focus-visible { outline: 3px solid var(--nm-blue); outline-offset: 2px; }
+.nm [tabindex="-1"]:focus { outline: none; }
+.nm-sr {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Layout ---------- */
+.nm-wrap { max-width: calc(1280px + 2 * var(--nm-gutter)); margin: 0 auto; padding: 0 var(--nm-gutter); }
+.nm-layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+
+/* ---------- Buttons ---------- */
+.nm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 52px; padding: 0 20px;
+  border: 1px solid transparent; border-radius: 10px;
+  font: inherit; font-size: 19px; font-weight: 800; letter-spacing: -.01em; line-height: 1.1;
+  text-decoration: none; cursor: pointer;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.nm-btn svg { width: 20px; height: 20px; }
+.nm-btn--primary { background: var(--nm-blue); color: #fff; }
+.nm-btn--primary:hover { background: var(--nm-blue-hover); }
+.nm-btn--secondary { background: #fff; color: var(--nm-navy); border-color: var(--nm-line); }
+.nm-btn--secondary:hover { border-color: var(--nm-navy); }
+.nm-btn--block { width: 100%; }
+.nm-btn[disabled] { opacity: .6; cursor: progress; }
+
+/* ---------- 1. Intro ---------- */
+.nm-intro { padding: 28px 0 36px; }
+.nm-eyebrow {
+  display: inline-block; margin-bottom: 16px; padding: 5px 10px;
+  background: var(--nm-aqua); border-radius: 8px;
+  font-size: 13px; font-weight: 800; letter-spacing: .02em;
+}
+.nm-intro h1 { font-size: clamp(34px, 9.4vw, 62px); line-height: 1.02; }
+.nm-lead { margin-top: 20px; max-width: 44ch; font-size: 17px; line-height: 1.6; }
+.nm-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 24px; }
+.nm-nowrap { white-space: nowrap; }
+.nm-facts {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  column-gap: 24px; margin-top: 32px;
+}
+.nm-fact { padding: 12px 0 14px; border-top: 1px solid var(--nm-line); }
+.nm-fact dt { font-size: 13px; font-weight: 700; color: var(--nm-muted); }
+.nm-fact dd { margin-top: 2px; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.nm-fact--price { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--nm-line); }
+.nm-fact--price dd { font-size: 26px; letter-spacing: -.03em; color: var(--nm-blue); }
+
+/* ---------- Booking column ---------- */
+.nm-aside {
+  margin: 0 calc(var(--nm-gutter) * -1);
+  padding: 32px var(--nm-gutter) 40px;
+  background: var(--nm-light);
+  border-block: 1px solid var(--nm-line);
+}
+.nm-card { background: #fff; border: 1px solid var(--nm-line); border-radius: 14px; box-shadow: var(--nm-shadow); }
+.nm-booking { padding: 22px 16px 24px; scroll-margin-top: 12px; }
+.nm-booking > h2 { font-size: 30px; margin-bottom: 20px; }
+.nm-status {
+  margin-bottom: 16px; padding: 12px 14px; border-radius: 10px;
+  background: #fdf0ef; color: var(--nm-danger); font-size: 15px; font-weight: 700;
+}
+.nm-status[hidden] { display: none; }
+
+.nm-step { min-width: 0; margin: 0; padding: 0; border: 0; }
+.nm-step + .nm-step { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--nm-line); }
+.nm-legend {
+  display: flex; align-items: center; gap: 10px; float: left; width: 100%;
+  margin-bottom: 12px; padding: 0;
+  font-size: 17px; font-weight: 800; letter-spacing: -.02em;
+}
+.nm-legend + * { clear: both; }
+.nm-num {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none;
+  border-radius: 50%; background: var(--nm-aqua);
+  font-size: 13px; font-weight: 800; letter-spacing: 0;
+}
+.nm-hint { margin: 0 0 12px; font-size: 14px; color: var(--nm-muted); }
+
+.nm-days-head {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+  margin-bottom: 6px; text-align: center;
+  font-size: 13px; font-weight: 700; color: var(--nm-muted);
+}
+.nm-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.nm-empty { min-height: 62px; }
+
+/* Radio "cards" — the real <input type=radio> stays in the label, visually hidden */
+.nm-opt { position: relative; display: block; min-width: 0; }
+.nm-opt input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; opacity: 0; }
+.nm-opt-body {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 62px; padding: 8px 4px;
+  background: #fff; border: 1px solid var(--nm-line); border-radius: 10px;
+  text-align: center; cursor: pointer;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.nm-opt:hover .nm-opt-body { border-color: var(--nm-blue); }
+.nm-opt input:checked + .nm-opt-body { background: var(--nm-navy); border-color: var(--nm-navy); color: #fff; }
+.nm-opt input:checked + .nm-opt-body .nm-opt-note { color: var(--nm-aqua); }
+.nm-opt input:focus-visible + .nm-opt-body { outline: 3px solid var(--nm-blue); outline-offset: 2px; }
+.nm-opt input:disabled + .nm-opt-body {
+  background: var(--nm-light); border-color: var(--nm-line); border-style: dashed;
+  color: var(--nm-muted); cursor: not-allowed;
+}
+.nm-opt-main { font-size: 17px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.nm-opt-note { font-size: 12.5px; font-weight: 600; line-height: 1.3; color: var(--nm-muted); }
+.nm-opt--past .nm-opt-main { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
+.nm-sleeve .nm-opt-body { flex-direction: row; gap: 8px; min-height: 56px; }
+.nm-dot {
+  width: 18px; height: 18px; flex: none; border-radius: 50%;
+  border: 2px solid var(--nm-field); background: #fff;
+}
+.nm-opt input:checked + .nm-opt-body .nm-dot { border-color: var(--nm-aqua); background: var(--nm-aqua); box-shadow: inset 0 0 0 3px var(--nm-navy); }
+
+.nm-fields { display: grid; gap: 14px; }
+.nm-field label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; }
+.nm-input {
+  display: block; width: 100%; min-height: 52px; padding: 12px 14px;
+  background: #fff; border: 1px solid var(--nm-field); border-radius: 10px;
+  font: inherit; font-size: 17px; color: var(--nm-navy);
+}
+.nm-input:focus { border-color: var(--nm-blue); outline: 3px solid var(--nm-blue); outline-offset: 1px; }
+.nm-input[aria-invalid="true"] { border-color: var(--nm-danger); }
+
+.nm-error {
+  display: flex; align-items: flex-start; gap: 8px; margin-top: 8px;
+  font-size: 14px; font-weight: 700; line-height: 1.4; color: var(--nm-danger);
+}
+.nm-error::before {
+  content: "!"; display: inline-grid; place-items: center; width: 18px; height: 18px; flex: none; margin-top: 1px;
+  border-radius: 50%; background: var(--nm-danger); color: #fff; font-size: 12px; font-weight: 800;
+}
+.nm-error[hidden] { display: none; }
+
+.nm-summary {
+  display: flex; align-items: center; gap: 10px; margin-top: 24px; padding: 14px 16px;
+  background: var(--nm-light); border-radius: 10px;
+  font-size: 16px; font-weight: 800; letter-spacing: -.01em; line-height: 1.35;
+}
+.nm-summary svg { width: 20px; height: 20px; color: var(--nm-blue-ink); }
+.nm-summary[hidden] { display: none; }
+.nm-submit { margin-top: 12px; min-height: 56px; }
+
+.nm-done { display: grid; justify-items: start; gap: 12px; }
+.nm-done[hidden] { display: none; }
+.nm-done-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--nm-aqua); }
+.nm-done-icon svg { width: 24px; height: 24px; stroke-width: 2.5; }
+.nm-done h3 { font-size: 28px; }
+.nm-done-when { width: 100%; padding: 14px 16px; background: var(--nm-light); border-radius: 10px; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+.nm-done-who { color: var(--nm-muted); font-weight: 600; }
+.nm-done .nm-btn { margin-top: 8px; }
+
+/* ---------- 5. Phones ---------- */
+.nm-phones { margin-top: 16px; padding: 20px 16px 22px; scroll-margin-top: 12px; }
+.nm-phones h2 { margin-bottom: 6px; font-size: 22px; letter-spacing: -.03em; }
+.nm-tel-list { list-style: none; padding: 0; }
+.nm-tel {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 64px; padding: 8px 0; border-bottom: 1px solid var(--nm-line);
+  color: var(--nm-navy); text-decoration: none;
+}
+.nm-tel-name { display: block; font-weight: 800; }
+.nm-tel-num { display: block; font-size: 15px; font-weight: 700; color: var(--nm-blue-ink); font-variant-numeric: tabular-nums; }
+.nm-tel-icon {
+  display: grid; place-items: center; width: 44px; height: 44px; flex: none;
+  border: 1px solid var(--nm-line); border-radius: 10px; color: var(--nm-blue-ink);
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.nm-tel-icon svg { width: 20px; height: 20px; }
+.nm-tel:hover .nm-tel-icon { background: var(--nm-blue); border-color: var(--nm-blue); color: #fff; }
+.nm-where { display: grid; gap: 10px; margin-top: 16px; padding: 0; list-style: none; font-size: 15px; font-weight: 600; }
+.nm-where li { display: flex; gap: 10px; align-items: flex-start; }
+.nm-where svg { width: 18px; height: 18px; margin-top: 3px; color: var(--nm-muted); }
+
+/* ---------- 2. How it helps ---------- */
+.nm-section { padding: 56px 0 8px; }
+.nm-section > h2 { font-size: clamp(30px, 7.6vw, 44px); }
+.nm-sleeves { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 24px; padding: 0; list-style: none; }
+.nm-sleeves li {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+  border: 1px solid var(--nm-line); border-radius: 8px; font-size: 15px; font-weight: 700;
+}
+.nm-sleeves li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--nm-blue); }
+.nm-photo {
+  display: grid; place-items: center; aspect-ratio: 16 / 9; margin-bottom: 28px; overflow: hidden;
+  background: var(--nm-light); border: 1px solid var(--nm-line); border-radius: 14px; color: #9fb4c1;
+}
+.nm-photo svg { width: 40px; height: 40px; stroke-width: 1.5; }
+.nm-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nm-benefits-list { padding: 0; list-style: none; counter-reset: nm-b; border-top: 1px solid var(--nm-line); }
+.nm-benefits-list li {
+  counter-increment: nm-b;
+  display: grid; grid-template-columns: 36px minmax(0, 1fr); column-gap: 12px; row-gap: 4px;
+  padding: 18px 0; border-bottom: 1px solid var(--nm-line);
+}
+.nm-benefits-list li::before {
+  content: counter(nm-b, decimal-leading-zero);
+  grid-row: 1 / span 2; padding-top: 3px;
+  font-size: 14px; font-weight: 800; color: var(--nm-blue-ink); font-variant-numeric: tabular-nums;
+}
+.nm-benefits-list h3 { font-size: 19px; letter-spacing: -.03em; line-height: 1.25; }
+.nm-benefits-list p { grid-column: 2; font-size: 15.5px; color: var(--nm-muted); }
+
+/* ---------- 3. Prices ---------- */
+.nm-prices { padding-bottom: 96px; } /* room for the mobile booking bar */
+.nm-price-grid { display: grid; gap: 16px; margin-top: 24px; }
+.nm-price { padding: 20px; }
+.nm-price h3 { font-size: 21px; letter-spacing: -.03em; }
+.nm-price-sub { margin-top: 6px; font-size: 14.5px; color: var(--nm-muted); }
+.nm-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.nm-table th, .nm-table td { padding: 12px 0; border-top: 1px solid var(--nm-line); text-align: left; vertical-align: baseline; }
+.nm-table thead th { padding-top: 0; border-top: 0; text-align: right; font-size: 13px; font-weight: 700; color: var(--nm-muted); }
+.nm-table thead td { padding: 0; border-top: 0; }
+.nm-table tbody th { font-weight: 600; }
+.nm-table td {
+  padding-left: 12px; text-align: right; white-space: nowrap;
+  font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--nm-blue);
+}
+
+/* ---------- Mobile booking bar ---------- */
+.nm-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, .97); border-top: 1px solid var(--nm-line);
+  box-shadow: 0 -8px 24px -16px rgba(9, 46, 77, .3);
+  transform: translateY(110%); visibility: hidden;
+  transition: transform .2s ease, visibility 0s linear .2s;
+}
+.nm-bar.is-visible { transform: none; visibility: visible; transition: transform .2s ease; }
+.nm-bar .nm-btn--secondary { width: 52px; padding: 0; }
+
+/* ---------- ≥600px ---------- */
+@media (min-width: 600px) {
+  .nm { --nm-gutter: 32px; }
+  .nm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .nm-price-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+
+/* ---------- Desktop: booking column on the right, from the first screen ---------- */
+@media (min-width: 1000px) {
+  .nm-layout {
+    grid-template-columns: minmax(0, 1fr) 440px;
+    grid-template-rows: auto auto 1fr;
+    column-gap: 64px; align-items: start;
+  }
+  .nm-intro { grid-column: 1; grid-row: 1; padding: 72px 0 24px; }
+  .nm-lead { font-size: 19px; }
+  .nm-aside { grid-column: 2; grid-row: 1 / span 3; margin: 0; padding: 40px 0 72px; background: none; border: 0; }
+  .nm-booking { padding: 28px; }
+  .nm-phones { padding: 24px 28px; }
+  .nm-benefits { grid-column: 1; grid-row: 2; padding-top: 48px; }
+  .nm-prices { grid-column: 1; grid-row: 3; padding-bottom: 72px; }
+  .nm-bar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nm *, .nm-bar { transition: none !important; }
+}
+
+/* ================= Added when fitting the design into the VSI site ================= */
+
+/* Line the page up with the site header, which uses --page-gutter from site.css. */
+.nm { --nm-gutter: var(--page-gutter, 16px); }
+@media (min-width: 600px) { .nm { --nm-gutter: var(--page-gutter, 32px); } }
+
+/* site.css styles every table/th/td globally; keep those rules out of the price tables. */
+.nm-table { font-size: 16px; }
+.nm-table th, .nm-table td { background: none; border-bottom: 0; }
+
+/* Photos of the three cuffs (arms, hips, legs). Placeholders until the club's photos arrive. */
+.nm-zones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 20px 0 28px; padding: 0; list-style: none; }
+.nm-zone { min-width: 0; }
+.nm-zone-img {
+  display: grid; place-items: center; align-content: center; gap: 6px;
+  aspect-ratio: 1 / 1; overflow: hidden; padding: 8px;
+  background: var(--nm-light) repeating-linear-gradient(135deg, transparent 0 10px, rgba(9, 46, 77, .035) 10px 20px);
+  border: 1px dashed #b7cbd6; border-radius: 12px; color: #7f98a8; text-align: center;
+}
+.nm-zone-img svg { width: 28px; height: 28px; stroke-width: 1.5; }
+.nm-zone-img small { font-size: 12px; font-weight: 700; line-height: 1.3; }
+/* The product photos sit on near-white (#fcfcfc); contain keeps each cuff whole in the square phone frame too. */
+.nm-zone-img:has(img) { padding: 0; border: 1px solid var(--nm-line); background: #fcfcfc; }
+.nm-zone-img img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.nm-zone-name { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
+.nm-zone-name::before { content: ""; width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--nm-blue); }
+@media (min-width: 600px) { .nm-zones { gap: 16px; } .nm-zone-img { aspect-ratio: 4 / 3; } }
+
+/* „Нова услуга“ gets the same bubbles as the menu badge (keyframes nav-new-bubble-lg live in style.css). */
+.nm-eyebrow { position: relative; }
+.nm-eyebrow i {
+  position: absolute; bottom: 100%; width: 6px; height: 6px; border-radius: 50%;
+  border: 1px solid var(--nm-blue); background: #fff; opacity: 0; pointer-events: none;
+  animation: nav-new-bubble-lg 2.9s ease-in infinite;
+}
+.nm-eyebrow i:nth-of-type(1) { left: 14%; animation-delay: .3s; }
+.nm-eyebrow i:nth-of-type(2) { left: 50%; width: 7px; height: 7px; animation-delay: 1.2s; }
+.nm-eyebrow i:nth-of-type(3) { left: 82%; width: 5px; height: 5px; animation-delay: 2s; }
+@media (prefers-reduced-motion: reduce) { .nm-eyebrow i { animation: none; display: none; } }
+
+/* SEO sections: breadcrumb, what it is, who it is for, questions. Same type scale as the design. */
+.nm-breadcrumb { margin-bottom: 18px; }
+.nm-text p { margin-top: 14px; max-width: 68ch; font-size: 16.5px; line-height: 1.65; }
+.nm-text > h2 + p { margin-top: 18px; }
+.nm-text a { color: var(--nm-blue-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.nm-text a:hover { color: var(--nm-navy); }
+.nm-who-list { margin-top: 18px; padding: 0; list-style: none; border-top: 1px solid var(--nm-line); }
+.nm-who-list li { position: relative; padding: 14px 0 14px 22px; border-bottom: 1px solid var(--nm-line); font-size: 16px; line-height: 1.55; }
+.nm-who-list li::before { content: ""; position: absolute; left: 2px; top: 23px; width: 8px; height: 8px; border-radius: 50%; background: var(--nm-blue); }
+/* Questions use the site's own <details> accordion (site.css: blue „+“ / „−“, divider under each). */
+.nm-faq-list { margin-top: 16px; border-top: 1px solid var(--nm-line); }
+.nm-faq-list summary { font-size: 17px; letter-spacing: -.01em; line-height: 1.4; }
+.nm-faq-list .vsid-faq-body p { margin-top: 0; padding: 0 28px 18px 0; font-size: 15.5px; color: var(--nm-muted); }
+
+/* Step 2: the procedure first (15 min · 30 min, and „Тренировка + дренаж“ across the full width), then the start
+   time. Every choice books one 30-minute slot, which the hint under the times says. */
+.nm-sublabel { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: var(--nm-muted); }
+.nm-duration { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.nm-dur .nm-opt-body { flex-direction: row; flex-wrap: wrap; column-gap: 10px; min-height: 52px; }
+.nm-dur--training { grid-column: 1 / -1; }
+.nm-slot-hint { margin: 10px 0 0; }
+.nm-training-hint { margin-top: -6px; color: var(--nm-blue-ink); font-weight: 700; }
+
+/* Prices are no longer the last section; the questions take the room for the phone booking bar. */
+.nm-prices { padding-bottom: 8px; }
+.nm-faq { padding-bottom: 96px; }
+@media (min-width: 1000px) {
+  .nm-layout { grid-template-rows: repeat(6, auto) 1fr; }
+  .nm-aside { grid-row: 1 / span 7; }
+  .nm-what { grid-column: 1; grid-row: 2; }
+  .nm-benefits { grid-row: 3; }
+  .nm-who { grid-column: 1; grid-row: 4; }
+  .nm-prices { grid-row: 5; padding-bottom: 8px; }
+  .nm-faq { grid-column: 1; grid-row: 6; padding-bottom: 72px; }
+}
+
+/* Мека сянка (chosen from the design variants on 2026-09-28)
+   Soft, navy-tinted depth: the call to action and the booking card lift off the page; everything else stays calm. */
+
+.nm { --nm-shadow: 0 1px 2px rgba(9, 46, 77, .05), 0 16px 36px -18px rgba(9, 46, 77, .26); }
+
+/* „Запазете час“ and the submit button carry a soft blue shadow and lift a little on hover. */
+.nm-btn { transition: background-color .15s, border-color .15s, color .15s, box-shadow .2s, transform .2s; }
+.nm-btn--primary { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 10px 22px -10px rgba(8, 127, 192, .75); }
+.nm-btn--primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 14px 28px -12px rgba(8, 127, 192, .8); }
+.nm-btn--primary:active { transform: translateY(0); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 5px 12px -7px rgba(8, 127, 192, .7); }
+.nm-btn--secondary { box-shadow: 0 6px 16px -10px rgba(9, 46, 77, .35); }
+.nm-btn--secondary:hover { transform: translateY(-1px); }
+
+/* The booking card sits highest on the page. */
+.nm-booking { box-shadow: 0 2px 4px rgba(9, 46, 77, .04), 0 28px 56px -24px rgba(9, 46, 77, .38); border-color: #e2edf2; }
+.nm-booking > h2 { text-shadow: 0 2px 10px rgba(8, 127, 192, .12); }
+
+/* Chosen day / time / cuff: a small drop so the choice reads as pressed into place. */
+.nm-opt input:checked + .nm-opt-body { box-shadow: 0 8px 16px -10px rgba(9, 46, 77, .7); }
+.nm-opt:hover .nm-opt-body { box-shadow: 0 6px 14px -10px rgba(8, 127, 192, .5); }
+
+.nm-eyebrow { box-shadow: 0 6px 14px -8px rgba(8, 127, 192, .55); }
+
+/* Photos and price cards: gentle depth, lift on hover. */
+.nm-zone-img:has(img) { box-shadow: 0 12px 26px -18px rgba(9, 46, 77, .45); transition: transform .25s, box-shadow .25s; }
+.nm-zone:hover .nm-zone-img { transform: translateY(-3px); box-shadow: 0 18px 32px -18px rgba(9, 46, 77, .5); }
+.nm-price { transition: box-shadow .25s; }
+.nm-price:hover { box-shadow: 0 2px 4px rgba(9, 46, 77, .05), 0 22px 40px -20px rgba(9, 46, 77, .34); }
+.nm-tel-icon { box-shadow: 0 4px 10px -6px rgba(8, 127, 192, .45); }
+.nm-bar { box-shadow: 0 -12px 28px -16px rgba(9, 46, 77, .45); }
+
+@media (prefers-reduced-motion: reduce) { .nm-btn:hover, .nm-zone:hover .nm-zone-img { transform: none; } }
+
+
+/* 2.4.0: a booked slot is plainly grey for everyone; the email field and the hidden spam trap of the booking form. */
+.nm-opt--taken input:disabled + .nm-opt-body { background: #e6eaed; border: 1px solid #d3dade; color: #5f6c75; box-shadow: none; }
+.nm-opt--taken .nm-opt-main { font-weight: 700; }
+.nm-opt--taken .nm-opt-note { color: #5f6c75; }
+.nm-opt--taken:hover .nm-opt-body { border-color: #d3dade; box-shadow: none; }
+.nm-field-hint { margin: 6px 0 0; font-size: 13px; }
+.nm-hp { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.nm-done-mail { color: var(--nm-muted); font-size: 14px; }
+
+/* 2.4.4: prices sit in the booking column, after the form and before „Предпочитате по телефона?“ (one price card
+   per row on desktop, two side by side from 600px up to the desktop layout). The „от 12 €“ fact is gone, so the
+   facts row gets its own bottom line. */
+.nm-aside .nm-prices { grid-column: auto; grid-row: auto; margin-top: 28px; padding: 0; }
+.nm-aside .nm-prices h2 { font-size: 22px; letter-spacing: -.03em; }
+.nm-aside .nm-price-grid { margin-top: 12px; }
+.nm-facts { border-bottom: 1px solid var(--nm-line); }
+@media (min-width: 1000px) {
+  .nm-aside .nm-price-grid { grid-template-columns: minmax(0, 1fr); }
+  .nm-layout { grid-template-rows: repeat(5, auto) 1fr; }
+  .nm-faq { grid-row: 5; }
+}
+
+/* 2.4.6: the three procedures in one row (15 мин · 30 мин · Тренировка + дренаж). Each button stacks its name
+   over its note, all the same height; the long package name is a little smaller so it wraps on two lines at most. */
+.nm-duration { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.nm-dur--training { grid-column: auto; }
+.nm-duration .nm-opt { display: flex; }
+.nm-dur .nm-opt-body { flex: 1; flex-direction: column; flex-wrap: nowrap; gap: 3px; min-height: 64px; padding: 8px 6px; text-align: center; }
+/* 2.4.7: a small line on top says what it is (Normatec / Плуване +), then the length, then the price. */
+.nm-opt-kicker { font-size: 11.5px; font-weight: 700; line-height: 1.2; color: var(--nm-muted); }
+.nm-opt input:checked + .nm-opt-body .nm-opt-kicker { color: var(--nm-aqua); }
+.nm-dur .nm-opt-body { gap: 2px; min-height: 72px; }
+
+/* Confirmation screen: change or cancel only by phone. */
+.nm-done-change { font-size: 14px; color: var(--nm-muted); }
+.nm-done-change a { color: var(--nm-blue); font-weight: 700; }

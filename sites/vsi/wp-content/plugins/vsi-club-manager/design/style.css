@@ -1,0 +1,122 @@
+/*
+Plugin presentation styles: VSI Website
+Description: Responsive Dolphins design for VSI. Editable club content is supplied by the free VSI Club Manager companion plugin.
+Version: 2.1.0
+Requires at least: 6.6
+Requires PHP: 8.1
+Author: VSI Swimming Club
+License: GPL-2.0-or-later
+Text Domain: vsi-dolphins
+*/
+.admin-bar header.site-header{top:32px}
+.entry-content{overflow-wrap:anywhere}.entry-content a{text-decoration:underline;color:var(--blue)}
+.entry-content img{height:auto}.entry-content ul,.entry-content ol{padding-left:24px}
+.vsid-empty{padding:32px;background:var(--light);border-radius:8px}
+.partner-logos img{width:auto;max-width:180px;max-height:62px}
+.vsid-fallback-logo{font-size:24px;font-weight:800;max-width:230px}
+.hero-no-photo{display:flex;align-items:center;justify-content:center;background:var(--light)}
+.wp-news-pagination{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:28px}
+.wp-news-pagination .page-numbers{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:6px}
+.wp-news-pagination .current{background:var(--blue);color:#fff}
+.news-post .poster-full-link .wp-post-image{display:block;width:100%;height:100%;object-fit:contain;max-height:none}
+.news-post:not(:has(.poster-full-link)){grid-template-columns:minmax(0,1fr)}
+.pagehead h1,.coach h3,.poster-card-copy h3{overflow-wrap:anywhere}
+.pricing-grid{align-items:start}.vsid-price-group{margin-bottom:24px}
+.pricing-grid .table-wrap{width:100%}.price{white-space:nowrap}
+.vsid-faq-body{padding-bottom:16px}.vsid-faq-body p:last-child{margin-bottom:0}
+.vsid-placeholder{font-size:11px;font-weight:700}
+.navlinks>ul{display:contents;list-style:none;padding:0;margin:0}.navlinks li{list-style:none}.navlinks .sub-menu{display:none}
+.site-footer-links{display:flex;flex-wrap:wrap;gap:20px}
+@media(max-width:782px){.admin-bar header.site-header{top:46px}}
+@media(max-width:600px){.admin-bar header.site-header{top:0}.pricing-grid .table-wrap{overflow:visible}.price{white-space:normal}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-slide{transition:none}.btn{transition:none}}
+
+.gallery-viewer button{font-size:30px;line-height:1}.gallery-grid .gallery-item img{height:auto}.vsic-day-table td{overflow-wrap:anywhere}
+
+/* 2.2.7 hero photo blend: the slideshow dissolves into the hero background instead of ending on a hard edge (vsi-hero-blend) */
+.hero-visual{isolation:isolate}
+.hero-slides,.hero-slide,.hero-slide img,.hero-visual>img,.hero-visual:after{border-radius:0!important}
+.hero-visual:after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(90deg,var(--light) 0%,rgba(240,247,250,.9) 8%,rgba(240,247,250,.45) 24%,rgba(240,247,250,0) 46%)}
+.hero-visual:before{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(0deg,rgba(4,42,71,.42),rgba(4,42,71,0) 45%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.25) 30%,#000 60%);mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.25) 30%,#000 60%)}
+.hero-visual .pool-note,.hero-visual .hero-controls,.hero-visual .photo-label{z-index:3}
+@media(max-width:800px){
+.hero-visual:after{background:linear-gradient(180deg,var(--light) 0%,rgba(240,247,250,.7) 14%,rgba(240,247,250,0) 42%)}
+.hero-visual:before{-webkit-mask-image:linear-gradient(0deg,#000 0%,#000 40%,transparent 70%);mask-image:linear-gradient(0deg,#000 0%,#000 40%,transparent 70%)}
+}
+
+/* „Ново“ badge on a menu tab. On desktop it sits above the label so the menu does not get wider. */
+.nav-new{display:inline-block;position:relative;padding:2px 7px;border-radius:5px;background:var(--aqua);color:var(--navy);font-size:11px;font-weight:800;letter-spacing:.02em;line-height:1.35;vertical-align:middle}
+@media(min-width:1001px){.navlinks a:has(.nav-new){position:relative}.navlinks .nav-new{position:absolute;left:50%;top:-6px;transform:translateX(-50%);white-space:nowrap;pointer-events:none}}
+@media(max-width:1000px){.navlinks .nav-new{margin-left:10px}}
+/* The long „Възстановяване“ tab: labels never wrap, and the menu tightens just above the phone-menu breakpoint
+   (1001–1080px) and where site.css switches back to full-size links (1201–1240px). */
+@media(min-width:1001px){.navlinks a{white-space:nowrap}}
+@media(min-width:1001px) and (max-width:1080px){.nav{gap:14px}.navlinks{gap:10px;font-size:12.5px}.navlinks .btn{padding:12px 14px}}
+@media(min-width:1201px) and (max-width:1240px){.navlinks{gap:17px}}
+
+/* ==== 2.3.9: the Normatec page's look across the whole site ====================================================
+   Soft navy-tinted depth („Мека сянка“), rounder buttons and cards, heavier and tighter headings, a little more air.
+   Layout and content are untouched; only surfaces, corners, type weight and spacing change. */
+:root{
+ --card-radius:14px;
+ --card-shadow:0 1px 2px rgba(9,46,77,.05),0 16px 36px -18px rgba(9,46,77,.26);
+ --card-shadow-hover:0 2px 4px rgba(9,46,77,.05),0 22px 40px -20px rgba(9,46,77,.34);
+ --btn-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 22px -10px rgba(8,127,192,.75);
+ --btn-shadow-hover:inset 0 1px 0 rgba(255,255,255,.22),0 14px 28px -12px rgba(8,127,192,.8);
+}
+
+/* Buttons: 10px corners, heavier label, soft blue shadow; they lift a little on hover and settle when pressed. */
+.btn{border-radius:10px;min-height:48px;font-size:15px;font-weight:800;letter-spacing:-.01em;box-shadow:var(--btn-shadow);transition:background .2s,transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--btn-shadow-hover)}
+.btn:active{transform:translateY(0);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 5px 12px -7px rgba(8,127,192,.7)}
+.btn.outline,.btn.white{box-shadow:0 6px 16px -10px rgba(9,46,77,.35)}
+.btn.outline:hover,.btn.white:hover{box-shadow:0 10px 22px -12px rgba(9,46,77,.4)}
+.navlinks .btn{font-size:inherit}           /* the menu keeps its measured widths */
+.page-numbers a,.wp-news-pagination .page-numbers{border-radius:10px}
+.pricing-details,.pricing-content .pricing-details{border-radius:10px}
+
+/* Cards and framed photos: 14px corners and the same soft depth. */
+.table-wrap,.poster-news-card,.news-empty,.news-booking,.facility-more,.cta,.activities-overview{border-radius:var(--card-radius)}
+.table-wrap,.poster-news-card,.activities-overview,.news-booking{box-shadow:var(--card-shadow)}
+.table-wrap{background:#fff;border-color:#e2edf2}
+/* Hover deepens the shadow only: animating transform on these cards stops some browsers painting their images. */
+.poster-news-card{transition:box-shadow .25s}
+.poster-news-card:hover{box-shadow:var(--card-shadow-hover)}
+.cta{box-shadow:0 24px 48px -24px rgba(6,30,52,.55)}
+.coach img,.coach-photo-placeholder,.coach-profile-photo,.about-photo,.map,.timetable-image-link img,
+.facility-detail-photo,.facility-photo,.news-post .poster-full-link{border-radius:var(--card-radius);box-shadow:0 12px 26px -18px rgba(9,46,77,.45)}
+.coach img{transition:box-shadow .25s}
+.coach:hover img{box-shadow:0 18px 32px -18px rgba(9,46,77,.5)}
+.gallery-item{border-radius:12px;box-shadow:0 10px 24px -16px rgba(9,46,77,.4)}
+.pool-note{border-radius:12px}
+.hero .pool-note{box-shadow:0 12px 30px -14px rgba(9,46,77,.35)}
+
+/* Headings: heavier and tighter, like the Normatec page. */
+h1,h2,h3{font-weight:800}
+h2{line-height:1.1;letter-spacing:-.04em;text-wrap:balance}
+h3{letter-spacing:-.03em}
+.pagehead h1,.coach-profile h1,.news-post h1{line-height:1.05;letter-spacing:-.045em;text-wrap:balance}
+.pricing-content h2{font-size:clamp(28px,2.6vw,36px);margin-bottom:18px}
+.section-head{margin-bottom:36px}
+
+/* A little more air between sections on phones. */
+@media(max-width:800px){
+ section.pad{padding:48px 0}
+ .pagehead{padding:32px 0 36px}
+ h2{font-size:clamp(28px,7.6vw,36px)}
+ .gallery-item{border-radius:10px}
+}
+@media(prefers-reduced-motion:reduce){.btn:hover{transform:none}}
+/* Small bubbles float up off the badge; larger on phones so they read at that size; none for reduced motion. */
+.nav-new i{position:absolute;bottom:100%;width:4px;height:4px;border-radius:50%;border:1px solid var(--blue);background:#fff;opacity:0;pointer-events:none;animation:nav-new-bubble 2.7s ease-in infinite}
+.nav-new i:nth-of-type(1){left:18%;animation-delay:.2s}
+.nav-new i:nth-of-type(2){left:52%;width:5px;height:5px;animation-delay:1.1s}
+.nav-new i:nth-of-type(3){left:78%;width:3px;height:3px;animation-delay:1.8s}
+@keyframes nav-new-bubble{0%{opacity:0;translate:0 5px}15%{opacity:1}75%{opacity:.8}100%{opacity:0;translate:2px -11px}}
+@media(max-width:1000px){
+ .nav-new i{width:6px;height:6px;animation-name:nav-new-bubble-lg}
+ .nav-new i:nth-of-type(2){width:7px;height:7px}
+ .nav-new i:nth-of-type(3){width:5px;height:5px}
+}
+@keyframes nav-new-bubble-lg{0%{opacity:0;translate:0 6px}15%{opacity:1}75%{opacity:.8}100%{opacity:0;translate:3px -17px}}
+@media(prefers-reduced-motion:reduce){.nav-new i{animation:none;display:none}}

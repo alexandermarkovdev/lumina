@@ -1,0 +1,53 @@
+/* The selected Lumina direction: clear copy on the existing photographic scenes. */
+.lm-main{padding-bottom:0}
+.lm-main .chapter h2{text-wrap:balance}
+.lm-main .lm-copy-list{display:grid;gap:25px;margin-top:30px}
+.lm-copy-item h3{font:500 28px/1.12 var(--serif);letter-spacing:-.02em;margin:0 0 8px}
+.lm-copy-item p{font:400 14px/1.8 var(--sans);color:var(--muted);margin:0;max-width:49ch}
+.lm-main .lm-value{font:500 25px/1.25 var(--serif);color:var(--ink);max-width:29ch;margin-top:30px}
+.lm-main .lv-tab{font-size:12px}
+.lm-main .lv-tabs--chips .lv-tab{font-size:12px;min-height:42px}
+.lm-main .lv-tab-panel li{font-size:12px}
+.lm-main .lv-tabs--chips .lv-tab-panel{min-height:190px;margin-top:10px}
+.lm-business-list{display:grid;gap:23px;margin-top:32px}
+.lm-business summary{display:flex;align-items:start;justify-content:space-between;gap:18px;list-style:none;cursor:pointer;padding:4px 0;min-height:48px}
+.lm-business summary::-webkit-details-marker{display:none}
+.lm-business summary>span{display:block;min-width:0}
+.lm-business summary strong{display:block;font:500 25px/1.15 var(--serif);letter-spacing:-.02em}
+.lm-business summary span span{display:block;font:400 13px/1.7 var(--sans);color:var(--muted);margin-top:6px}
+.lm-business summary svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.35;flex:none;margin-top:6px;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.lm-business[open]:not([data-expanded=false]) summary svg,.lm-business[data-expanded=true] summary svg{transform:rotate(45deg)}
+.lm-business summary:focus-visible{outline:2px solid var(--ink);outline-offset:6px}
+.lm-business-panel{overflow:hidden}
+.lm-business-content{padding:15px 30px 2px 0;font:400 14px/1.8 var(--sans);color:var(--muted)}
+.lm-business-content p{margin:0 0 12px}
+.lm-business-content p:last-child{margin-bottom:0}
+.lm-business-content strong{font-weight:600;color:var(--ink)}
+.lm-main #projects .lv-tab-panel{min-height:225px}
+.lm-main #projects .lv-tab-panel p{max-width:43ch}
+.lm-main .contact-links{border:0;padding:0;margin-top:27px}
+.lm-main .contact-pending{font-size:14px;line-height:1.8}
+.lm-contact-form{display:grid;gap:17px;margin-top:28px;max-width:500px}
+.lm-contact-form label{display:grid;gap:7px;font:400 13px/1.5 var(--sans)}
+.lm-contact-form input,.lm-contact-form textarea{width:100%;border:1px solid #aaa293;background:#f7f3eb;color:var(--ink);padding:12px;font:400 15px/1.6 var(--sans);border-radius:0}
+.lm-contact-form textarea{resize:vertical;min-height:105px}
+.lm-contact-form .button{border:0;justify-content:center;cursor:pointer}
+.lm-contact-form [role=status],.lm-contact-form .lm-form-help{font:400 12px/1.7 var(--sans);color:var(--muted);margin:0}
+.lm-contact-form[hidden]{display:none}
+@media(prefers-reduced-motion:reduce){.lm-business summary svg{transition:none}}
+@media(min-width:1201px){
+ .lm-main #why .chapter-content,.lm-main #services .chapter-content,.lm-main #businesses .chapter-content{width:42vw;max-width:570px}
+ .lm-main #process .chapter-content{width:37vw;max-width:540px}
+ .lm-main #businesses{padding-top:76px;padding-bottom:76px}
+ .lm-main #businesses .scene-canvas{top:46%}
+}
+@media(max-width:700px){
+ .lm-main{padding-bottom:0}
+ .lm-main .lm-copy-list{gap:23px;margin-top:26px}
+ .lm-copy-item h3{font-size:27px}
+ .lm-main .lm-value{font-size:25px;margin-top:25px}
+ .lm-business-list{gap:22px;margin-top:27px}
+ .lm-business summary strong{font-size:25px}
+ .lm-business-content{padding-right:8px}
+ .lm-main #projects .lv-tab-panel{min-height:240px}
+}
