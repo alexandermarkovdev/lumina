@@ -11,6 +11,8 @@
   const signals='<svg viewBox="0 0 66 16" aria-hidden="true"><path d="M2 13V10M7 13V7M12 13V4M17 13V1" stroke="currentColor" stroke-width="3"/><path d="M25 5q8-7 16 0M28 8q5-4 10 0M31 11q2-2 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="47" y="2" width="16" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="49" y="4" width="12" height="7" rx="1" fill="currentColor"/><path d="M65 6v3" stroke="currentColor" stroke-width="2"/></svg>';
   const registry = new Map(), screens = new Map(), devices = [];
   const motion = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Bound memory on touch devices: one live viewport, posters for the others.
+  const compactPreview = () => innerWidth <= 1000 || matchMedia('(pointer: coarse)').matches;
   const autoMode = () => innerWidth <= 600 ? 'mobile' : innerWidth <= 1000 ? 'tablet' : 'desktop';
   const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 12L12 4M5 4h7v7"/></svg>';
   let active, heroButton, resizeQueued = false;
@@ -179,6 +181,7 @@
     await Promise.race([Promise.all([doc.fonts?.ready,...images.map(img=>img.decode().catch(()=>{}))]),new Promise(resolve=>{assetTimer=setTimeout(resolve,1500);})]);
     clearTimeout(assetTimer);
     if(version!==screen.version)return;
+    if(screen.view.preserveViewOnClose&&screen.scroll.y)restoreScroll(screen);
     clearTimeout(screen.timer);clearInterval(screen.poll);
     screen.ready=true;screen.failed=false;screen.el.classList.add('is-live');
     screen.el.dataset.readyAt=Math.round(performance.now());
@@ -195,7 +198,8 @@
     frame.title=`${screen.project.name} — ${LABELS[screen.mode]}`;frame.allow='clipboard-write';
     frame.width=screen.view.width;frame.height=screen.view.height;
     Object.assign(frame.style,{width:screen.view.width+'px',height:screen.view.height+'px'});
-    frame.tabIndex=-1;frame.inert=true;frame.setAttribute('aria-hidden','true');
+    const interactive=dialog.open&&state.screen===screen;
+    frame.tabIndex=interactive?0:-1;frame.inert=!interactive;frame.setAttribute('aria-hidden',String(!interactive));
     frame.style.colorScheme=screen.project.colorScheme||'dark';
     let checking=false;
     const fail=()=>{if(version!==screen.version)return;clearInterval(screen.poll);screen.failed=true;if(state.screen===screen)updateStatus();scheduleRotation();};
@@ -230,7 +234,30 @@
     const poster=document.createElement('img');poster.className='lp-poster';poster.src=view.poster;poster.alt='';display.append(poster);el.append(shell);dialog.append(el);
     shell.querySelector('.lp-home').addEventListener('click',close);
     const screen={el,shell,display,poster,project,mode,view,size,frame:null,version:0,ready:false,failed:false,timer:0,poll:0,inside:null,scroll:{x:0,y:0}};
-    screens.set(key,screen);loadScreen(screen);return screen;
+    screens.set(key,screen);return screen;
+  }
+  function releaseScreen(screen) {
+    if(!screen.frame)return;
+    rememberScroll(screen);++screen.version;
+    clearInterval(screen.poll);clearTimeout(screen.timer);
+    screen.presentation?.stop();screen.presentation=null;screen.inside?.abort();
+    screen.frame.remove();screen.frame=null;screen.ready=false;screen.failed=false;screen.resettingHome=false;
+    screen.el.classList.remove('is-live');
+  }
+  function syncScreens() {
+    const compact=compactPreview();
+    const show=dialog.open||(!document.hidden&&!rotation.holds.has('offscreen'));
+    const wanted=new Set();
+    if(show){
+      const modes=compact?[dialog.open?state.mode:autoMode()]:MODES;
+      modes.forEach(mode=>wanted.add(getScreen(registry.get(active),mode)));
+    }
+    const changed=[...screens.values()].some(s=>!!s.frame!==wanted.has(s));
+    if(changed&&!dialog.open)restartTour({keepView:rotation.keepView});
+    // Release first, then load: switching never temporarily doubles memory.
+    screens.forEach(s=>{if(!wanted.has(s))releaseScreen(s);});
+    wanted.forEach(s=>{if(!s.frame)loadScreen(s);});
+    devices.forEach(d=>d.box.classList.toggle('is-live',!!screens.get(active+'/'+d.mode)?.ready));
   }
   function place(screen, box, clip='none') {
     screen.el.classList.remove('is-scene-screen');screen.el.dataset.anchor='home';
@@ -362,7 +389,8 @@
   }
   function canTour(){return registry.size>1&&!rotation.paused&&!rotation.holds.size&&!dialog.open&&!document.hidden;}
   function beginTour(){
-    const current=MODES.map(mode=>getScreen(registry.get(active),mode));
+    const current=[...screens.values()].filter(s=>s.project.id===active&&s.frame);
+    if(!current.length)return false;
     if(!current.every(s=>(s.ready||s.failed)&&!s.resettingHome))return false;
     if(!rotation.keepView)current.forEach(s=>resetPreview(s,true));
     if(current.some(s=>s.resettingHome))return false;
@@ -371,7 +399,7 @@
         const win=s.frame.contentWindow;s.tourStart=win.scrollY;
         // Decode the rest of this page during its opening hold, before the tour
         // reaches it. Inactive projects retain their own lazy-loading behavior.
-        win.document.querySelectorAll('img[loading=lazy]').forEach(img=>{img.loading='eager';});
+        if(!compactPreview())win.document.querySelectorAll('img[loading=lazy]').forEach(img=>{img.loading='eager';});
       }catch{s.tourStart=0;}
       if(!rotation.keepView)s.presentation?.run();
     });
@@ -409,6 +437,7 @@
         toggle.innerHTML=rotation.paused?'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z"/></svg>':'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg>';
       }
     });
+    syncScreens();
     const running=canTour();
     document.body.dataset.previewRotation=running?'running':'paused';
     if(!running){stopTour();return;}
@@ -431,7 +460,7 @@
     const selected=V.segment.querySelector('[aria-pressed=true]');V.thumb.style.width=selected.offsetWidth+'px';V.thumb.style.transform=`translateX(${selected.offsetLeft}px)`;
     screens.forEach(s=>{
       const selected=s===state.screen;s.el.hidden=!selected;s.el.classList.toggle('is-selected',selected);
-      s.frame.inert=!selected;s.frame.tabIndex=selected?0:-1;s.frame.setAttribute('aria-hidden',String(!selected));
+      if(s.frame){s.frame.inert=!selected;s.frame.tabIndex=selected?0:-1;s.frame.setAttribute('aria-hidden',String(!selected));}
       setThumbnail(s,!selected);
     });
     place(state.screen,rect(V.port));updateStatus();
@@ -484,7 +513,7 @@
     state.saved={overflow:document.documentElement.style.overflow,x:scrollX,y:scrollY,hash:location.hash,keepPlace:!!opener?.closest('#projects')||!!source?.scene};
     document.documentElement.style.overflow='hidden';
     dialog.querySelector('#lp-title').textContent=state.project.name+' — преглед на сайта';
-    dialog.inert=false;dialog.removeAttribute('aria-hidden');dialog.showModal();layoutViewer();V.close.focus({preventScroll:true});screens.forEach(restoreScroll);
+    dialog.inert=false;dialog.removeAttribute('aria-hidden');dialog.showModal();syncScreens();layoutViewer();V.close.focus({preventScroll:true});screens.forEach(restoreScroll);
     state.screen.presentation?.run({cursor:false});
     if(motion()&&visible(from))animateFrom(state.screen,from,rect(state.screen.el),600);
     else state.screen.el.animate({opacity:[0,1]},{duration:150});
@@ -498,7 +527,7 @@
     const saved=state.saved,returnPosition=saved.keepPlace?{left:saved.x,top:saved.y}:{left:0,top:0};
     window.scrollTo({...returnPosition,behavior:'instant'});
     dialog.inert=true;dialog.setAttribute('aria-hidden','true');
-    screens.forEach(s=>{s.el.classList.remove('is-selected');s.frame.inert=true;s.frame.tabIndex=-1;s.frame.setAttribute('aria-hidden','true');setThumbnail(s,true);});
+    screens.forEach(s=>{s.el.classList.remove('is-selected');if(s.frame){s.frame.inert=true;s.frame.tabIndex=-1;s.frame.setAttribute('aria-hidden','true');}setThumbnail(s,true);});
     const opener=state.opener;state.project=null;state.screen=null;state.source=null;state.opener=null;state.closing=false;
     const focusTarget=saved.keepPlace?opener:heroButton||opener;
     focusTarget?.focus({preventScroll:true});
@@ -528,7 +557,7 @@
   function switchMode(mode) {
     if(!MODES.includes(mode)||mode===state.mode||!dialog.open||state.closing)return;
     const before=rect(state.screen.el);cancelAnimations();state.screen.presentation?.stop();rememberScroll(state.screen);
-    state.mode=mode;state.screen=getScreen(state.project,mode);layoutViewer();restoreScroll(state.screen);
+    state.mode=mode;state.screen=getScreen(state.project,mode);syncScreens();layoutViewer();restoreScroll(state.screen);
     state.screen.presentation?.run({cursor:false});
     if(motion()){
       const after=rect(state.screen.el),scale=Math.min(before.width/after.width,before.height/after.height);
@@ -543,7 +572,7 @@
   V.close.addEventListener('click',close);V.backdrop.addEventListener('click',close);
   V.failure.querySelector('button').addEventListener('click',()=>{if(!state.closing){loadScreen(state.screen);layoutViewer();}});
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});dialog.addEventListener('close',cleanup);
-  addEventListener('resize',queueLayout);addEventListener('scroll',()=>{if(!dialog.open)queueLayout();},{passive:true});addEventListener('load',queueLayout);document.fonts?.ready.then(queueLayout);
+  addEventListener('resize',()=>{syncScreens();queueLayout();scheduleRotation();});addEventListener('scroll',()=>{if(!dialog.open)queueLayout();},{passive:true});addEventListener('load',queueLayout);document.fonts?.ready.then(queueLayout);
   document.addEventListener('visibilitychange',scheduleRotation);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches){rotation.paused=true;scheduleRotation();}});
   const rotationRegions=[document.querySelector('.landing'),document.querySelector('#projects')].filter(Boolean);
@@ -553,5 +582,5 @@
   document.addEventListener('focusout',()=>queueMicrotask(()=>{const el=document.activeElement;holdRotation('focus',!!el?.closest('.landing,#projects')&&!el.closest('.lp-rotation-controls'));}));
   window.LuminaPreview=Object.freeze({register,select,open,close,setMode:switchMode,hold:holdRotation,next(){advance();},get active(){return active;},get projects(){return [...registry.keys()];}});
   select(active);
-  registry.forEach(project=>MODES.forEach(mode=>getScreen(project,mode)));
+  // Other projects are loaded only when selected, never all twelve at startup.
 })();
