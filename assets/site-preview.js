@@ -11,7 +11,7 @@
   const signals='<svg viewBox="0 0 66 16" aria-hidden="true"><path d="M2 13V10M7 13V7M12 13V4M17 13V1" stroke="currentColor" stroke-width="3"/><path d="M25 5q8-7 16 0M28 8q5-4 10 0M31 11q2-2 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="47" y="2" width="16" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="49" y="4" width="12" height="7" rx="1" fill="currentColor"/><path d="M65 6v3" stroke="currentColor" stroke-width="2"/></svg>';
   const registry = new Map(), screens = new Map(), devices = [];
   const motion = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Bound memory on touch devices: one live viewport, posters for the others.
+  // Keep only the current project alive; all three viewport tours stay synchronized.
   const compactPreview = () => innerWidth <= 1000 || matchMedia('(pointer: coarse)').matches;
   const autoMode = () => innerWidth <= 600 ? 'mobile' : innerWidth <= 1000 ? 'tablet' : 'desktop';
   const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 12L12 4M5 4h7v7"/></svg>';
@@ -87,6 +87,10 @@
   function prepareDocument(screen,doc){
     // Embedding adapters live here: the imported site's files stay byte-identical.
     setThumbnail(screen,!dialog.open||state.screen!==screen);
+    if(!doc.getElementById('lumina-tour-style')){
+      const style=doc.createElement('style');style.id='lumina-tour-style';
+      style.textContent='html[data-lumina-thumbnail],html[data-lumina-thumbnail] *{scroll-behavior:auto!important}';doc.head.append(style);
+    }
     screen.presentation?.stop();
     screen.presentation=createPresentation(screen,doc);
     if(screen.project.hideInThumbnail&&!doc.getElementById('lumina-preview-adapter')){
@@ -245,11 +249,10 @@
     screen.el.classList.remove('is-live');
   }
   function syncScreens() {
-    const compact=compactPreview();
     const show=dialog.open||(!document.hidden&&!rotation.holds.has('offscreen'));
     const wanted=new Set();
     if(show){
-      const modes=compact?[dialog.open?state.mode:autoMode()]:MODES;
+      const modes=dialog.open?[state.mode]:MODES;
       modes.forEach(mode=>wanted.add(getScreen(registry.get(active),mode)));
     }
     const changed=[...screens.values()].some(s=>!!s.frame!==wanted.has(s));
@@ -317,6 +320,7 @@
   if(projectScene){
     projectScene.closest('.scene-art').removeAttribute('aria-hidden');
     createDevice('desktop',projectScene,true);
+    MODES.forEach(mode=>{createDevice(mode,projectScene);devices[devices.length-1].box.classList.add('lp-mobile-project-device');});
     new MutationObserver(queueLayout).observe(projectScene.closest('section'),{subtree:true,attributes:true,attributeFilter:['aria-selected']});
   }
   const scene=document.querySelector('.landing .scene');
@@ -379,7 +383,7 @@
   }
   function holdRotation(reason,held){held?rotation.holds.add(reason):rotation.holds.delete(reason);scheduleRotation();}
   function stopTour(){
-    cancelAnimationFrame(rotation.frame);rotation.frame=0;rotation.last=0;
+    cancelAnimationFrame(rotation.frame);rotation.frame=0;rotation.last=0;rotation.painted=0;
     screens.forEach(s=>s.presentation?.pause());
   }
   function restartTour({keepView=false}={}){
@@ -411,6 +415,9 @@
     if(!rotation.started&&!beginTour()){document.body.dataset.previewTour='loading';return;}
     if(rotation.last)rotation.elapsed+=now-rotation.last;
     rotation.last=now;
+    // Small screens share a 30fps tour clock, avoiding three scroll layouts at 60/120Hz.
+    if(compactPreview()&&rotation.painted&&now-rotation.painted<32){rotation.frame=requestAnimationFrame(tourFrame);return;}
+    rotation.painted=now;
     const hold=registry.get(active).presentation==='jtn-doors'?4800:1800;
     const progress=Math.max(0,Math.min(1,(rotation.elapsed-hold)/(rotation.interval-hold-1000)));
     // A short acceleration/deceleration around an otherwise steady pan.
@@ -573,6 +580,12 @@
   V.failure.querySelector('button').addEventListener('click',()=>{if(!state.closing){loadScreen(state.screen);layoutViewer();}});
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});dialog.addEventListener('close',cleanup);
   addEventListener('resize',()=>{syncScreens();queueLayout();scheduleRotation();});addEventListener('scroll',()=>{if(!dialog.open)queueLayout();},{passive:true});addEventListener('load',queueLayout);document.fonts?.ready.then(queueLayout);
+  let parentScrollTimer;
+  addEventListener('scroll',()=>{
+    if(dialog.open||!compactPreview())return;
+    if(!rotation.holds.has('parent-scroll'))holdRotation('parent-scroll',true);
+    clearTimeout(parentScrollTimer);parentScrollTimer=setTimeout(()=>holdRotation('parent-scroll',false),180);
+  },{passive:true});
   document.addEventListener('visibilitychange',scheduleRotation);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches){rotation.paused=true;scheduleRotation();}});
   const rotationRegions=[document.querySelector('.landing'),document.querySelector('#projects')].filter(Boolean);
