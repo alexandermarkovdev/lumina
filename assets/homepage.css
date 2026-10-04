@@ -119,6 +119,7 @@
 @media(max-width:359px){.lm-main .landing-copy,.lm-main .chapter{padding-left:20px;padding-right:20px}.lm-main .landing-actions{flex-direction:row}.lm-main .landing-actions .button{width:auto;font-size:10px}.lm-main .lp-showcase-actions{gap:0}.lm-main .lp-hero-link{font-size:11px}}
 
 /* Explicit clipping bounds iframe compositing on mobile WebKit. */
+#projects .lp-device--scene::after{content:"";display:block;position:absolute;left:0;top:98.08%;width:100%;height:5.55%;border-radius:0;background:linear-gradient(105deg,#d7cdc0 0%,#b4a492 55%,#a69683 83%,#bfb09b 100%);clip-path:polygon(0 0,100% 31%,100% 100%,2% 69%,0 48%);pointer-events:none;z-index:0}
 @media(max-width:1000px),(pointer:coarse){.lp-glass,.lp-display{overflow:hidden;contain:paint}.lp-viewer:not([open]) .lp-hardware{box-shadow:none}}
 /* A fine rim remains legible against the pale mobile scene, without a costly blur. */
 @media(max-width:900px){
