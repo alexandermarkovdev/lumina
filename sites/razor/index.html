@@ -697,7 +697,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
   // Theme before first paint: the visitor's saved choice, otherwise dark
   (function(){var t;try{t=localStorage.getItem('razor-theme')}catch(e){}document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')})();
 </script>
-<script>if(new URLSearchParams(location.search).has("lumina-preview"))document.documentElement.setAttribute("data-lumina-preview","");</script><link rel="stylesheet" href="preview-fixes.css?v=preview-input-9"></head>
+<script>const luminaParams=new URLSearchParams(location.search);if(luminaParams.has('lumina-preview'))document.documentElement.setAttribute('data-lumina-preview','');if(luminaParams.has('lumina-thumbnail'))document.documentElement.setAttribute('data-lumina-thumbnail','');</script><link rel="stylesheet" href="preview-fixes.css?v=razor-smooth-10"></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 L8.12 15.88"/><path d="M14.47 14.48 L20 20"/><path d="M8.12 8.12 L12 12"/></symbol>
@@ -847,7 +847,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
           <g class="blade-b"><path d="M214 206 L282 14 Q276 2 264 10 L178 196 Z"/><path class="ring" d="M194 204 L142 296"/><circle class="ring" cx="126" cy="340" r="46"/></g>
         </svg></div>
         <div class="hero-circle">
-          <img src="img/brasnarnica-razor-stamboliyski-salon.webp" width="1200" height="1200" alt="Интериорът на Barbershop Razor — черен бръснарски стол, огледало, мивка за измиване и кремав диван под таван с релефни кръгове" loading="eager" fetchpriority="high" decoding="async">
+          <img data-full-src="img/brasnarnica-razor-stamboliyski-salon.webp" src="img/preview/brasnarnica-razor-stamboliyski-salon.webp" width="1200" height="1200" alt="Интериорът на Barbershop Razor — черен бръснарски стол, огледало, мивка за измиване и кремав диван под таван с релефни кръгове" loading="eager" fetchpriority="high" decoding="async">
         </div>
         </div>
         <figcaption>Мъжки стил в сърцето на Стамболийски.</figcaption>
@@ -862,7 +862,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
       <div class="head">
         <h2 class="h2" id="about-title">Добра прическа.<br><em>Познато място</em>.</h2>
         <figure class="about-figure">
-          <img src="img/brasnarnica-razor-vhod-antim-1.webp" width="941" height="1672" alt="Входът на Barbershop Razor на ул. Антим I в Стамболийски — черна табела и бръснарски стълб до вратата" loading="lazy" decoding="async">
+          <img data-full-src="img/brasnarnica-razor-vhod-antim-1.webp" src="img/preview/brasnarnica-razor-vhod-antim-1.webp" width="941" height="1672" alt="Входът на Barbershop Razor на ул. Антим I в Стамболийски — черна табела и бръснарски стълб до вратата" loading="lazy" decoding="async">
           <figcaption>Входът на Антим I — търси бръснарския стълб.</figcaption>
         </figure>
       </div>
@@ -932,22 +932,22 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
       </div>
       <div class="gallery-grid mosaic">
         <button class="photo" type="button" data-caption="Фейд с пригладена коса и брада" aria-label="Увеличи снимката: фейд с пригладена коса и брада">
-          <img src="img/fade-priglazhena-kosa-brada.webp" width="900" height="1125" alt="Прическа с пригладена назад коса, плавен скин фейд и оформена плътна брада в Barbershop Razor." loading="lazy" decoding="async"><span>Фейд с пригладена коса и брада</span>
+          <img data-full-src="img/fade-priglazhena-kosa-brada.webp" src="img/preview/fade-priglazhena-kosa-brada.webp" width="900" height="1125" alt="Прическа с пригладена назад коса, плавен скин фейд и оформена плътна брада в Barbershop Razor." loading="lazy" decoding="async"><span>Фейд с пригладена коса и брада</span>
         </button>
         <button class="photo" type="button" data-caption="Прецизен фейд и чист контур" aria-label="Увеличи снимката: прецизен фейд и чист контур">
-          <img src="img/skin-fade-chist-kontur.webp" width="900" height="1125" alt="Къса прическа с изчистен скин фейд, прецизен контур и оформена брада в Barbershop Razor." loading="lazy" decoding="async"><span>Прецизен фейд и чист контур</span>
+          <img data-full-src="img/skin-fade-chist-kontur.webp" src="img/preview/skin-fade-chist-kontur.webp" width="900" height="1125" alt="Къса прическа с изчистен скин фейд, прецизен контур и оформена брада в Barbershop Razor." loading="lazy" decoding="async"><span>Прецизен фейд и чист контур</span>
         </button>
         <button class="photo" type="button" data-caption="Текстурирана коса и висок фейд" aria-label="Увеличи снимката: текстурирана коса и висок фейд">
-          <img src="img/teksturirana-kosa-visok-fade.webp" width="1200" height="1600" alt="Прическа с текстурирана коса отгоре и висок плавен фейд отстрани в Barbershop Razor." loading="lazy" decoding="async"><span>Текстурирана коса и висок фейд</span>
+          <img data-full-src="img/teksturirana-kosa-visok-fade.webp" src="img/preview/teksturirana-kosa-visok-fade.webp" width="1200" height="1600" alt="Прическа с текстурирана коса отгоре и висок плавен фейд отстрани в Barbershop Razor." loading="lazy" decoding="async"><span>Текстурирана коса и висок фейд</span>
         </button>
         <button class="photo" type="button" data-caption="Фейд с дизайн от линии" aria-label="Увеличи снимката: фейд с дизайн от линии">
-          <img src="img/fade-dizain-ot-linii.webp" width="1200" height="1518" alt="Текстурирана прическа с плавен фейд и бръснат дизайн от линии отстрани в Barbershop Razor." loading="lazy" decoding="async"><span>Фейд с дизайн от линии</span>
+          <img data-full-src="img/fade-dizain-ot-linii.webp" src="img/preview/fade-dizain-ot-linii.webp" width="1200" height="1518" alt="Текстурирана прическа с плавен фейд и бръснат дизайн от линии отстрани в Barbershop Razor." loading="lazy" decoding="async"><span>Фейд с дизайн от линии</span>
         </button>
         <button class="photo" type="button" data-caption="Къс кроп с нисък фейд и линия" aria-label="Увеличи снимката: къс кроп с нисък фейд и линия">
-          <img src="img/kas-krop-nisak-fade.webp" width="1200" height="1500" alt="Къса текстурирана прическа с нисък фейд, изчистен контур и бръсната линия зад ухото в Barbershop Razor." loading="lazy" decoding="async"><span>Къс кроп с нисък фейд и линия</span>
+          <img data-full-src="img/kas-krop-nisak-fade.webp" src="img/preview/kas-krop-nisak-fade.webp" width="1200" height="1500" alt="Къса текстурирана прическа с нисък фейд, изчистен контур и бръсната линия зад ухото в Barbershop Razor." loading="lazy" decoding="async"><span>Къс кроп с нисък фейд и линия</span>
         </button>
         <button class="photo" type="button" data-caption="Пригладена коса и нисък фейд" aria-label="Увеличи снимката: пригладена коса и нисък фейд">
-          <img src="img/priglazhena-kosa-nisak-fade.webp" width="462" height="619" alt="Прическа с пригладена назад коса, нисък фейд и оформена брада в Barbershop Razor." loading="lazy" decoding="async"><span>Пригладена коса и нисък фейд</span>
+          <img data-full-src="img/priglazhena-kosa-nisak-fade.webp" src="img/preview/priglazhena-kosa-nisak-fade.webp" width="462" height="619" alt="Прическа с пригладена назад коса, нисък фейд и оформена брада в Barbershop Razor." loading="lazy" decoding="async"><span>Пригладена коса и нисък фейд</span>
         </button>
       </div>
       <p class="gallery-note">Истински прически от салона. Натисни снимка, за да я разгледаш отблизо.</p>
@@ -1290,6 +1290,20 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
     const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
     const root = document.documentElement;
+    // Small screens in Lumina use small decoded images. Opening the device
+    // restores the original files without changing dimensions or scroll position.
+    const previewImages = [...document.querySelectorAll('img[data-full-src]')];
+    previewImages.forEach(img => { img.dataset.fullLoading = img.loading || 'eager'; });
+    const syncPreviewImages = () => {
+      const thumbnail = root.hasAttribute('data-lumina-thumbnail');
+      previewImages.forEach(img => {
+        const src = thumbnail ? img.dataset.fullSrc.replace('img/', 'img/preview/') : img.dataset.fullSrc;
+        img.loading = thumbnail ? 'eager' : img.dataset.fullLoading;
+        if (img.getAttribute('src') !== src) img.src = src;
+      });
+    };
+    syncPreviewImages();
+    new MutationObserver(syncPreviewImages).observe(root,{attributes:true,attributeFilter:['data-lumina-thumbnail']});
     const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 
     // Theme: dark until the visitor picks light; the new theme spreads from the button
@@ -1408,7 +1422,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
       const trailEl = $('.orbit-trail'), sc = $('.orbit-scissors');
       const bladeA = $('.blade-a', sc), bladeB = $('.blade-b', sc);
       const TAU = Math.PI * 2, LAP = 10000, SNIP = 800;
-      let w = 0, h = 0, gap = 0;
+      let w = 0, h = 0, gap = 0, toolSize = 0;
       // The line is drawn once per size in its own frame (scissors at the top) and then just rotated
       const drawTrail = () => {
         const PAD = 8, s = w + gap * 2 + PAD * 2, c = s / 2, R = c - PAD, N = 360;
@@ -1429,6 +1443,8 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
       const measure = () => {
         w = orbit.clientWidth; h = orbit.clientHeight;
         gap = parseFloat(getComputedStyle(orbit).getPropertyValue('--orbit-gap')) || 0;
+        toolSize = sc.offsetWidth;
+        if (root.hasAttribute('data-lumina-preview')) sc.style.transform = `translate(${w / 2}px,${-gap}px) rotate(90deg)`;
         drawTrail();
       };
       new ResizeObserver(measure).observe(orbit);
@@ -1453,15 +1469,15 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
         lastPaint=now;
         const t = elapsed, a = (t % LAP) / LAP * TAU, ang = a - Math.PI / 2, R = w / 2 + gap;
         const x = w / 2 + R * Math.cos(ang), y = h / 2 + R * Math.sin(ang);
-        sc.style.left = x + 'px'; sc.style.top = y + 'px';
-        sc.style.transform = `rotate(${(ang * 180 / Math.PI + 180).toFixed(2)}deg)`;
+        if (!embeddedOrbit) { sc.style.left = x + 'px'; sc.style.top = y + 'px'; }
+        sc.style.transform = `${embeddedOrbit ? `translate(${x}px,${y}px) ` : ''}rotate(${(ang * 180 / Math.PI + 180).toFixed(2)}deg)`;
         trailEl.style.transform = `rotate(${a.toFixed(4)}rad)`;
         const close = .5 - .5 * Math.cos((t % SNIP) / SNIP * TAU);
         bladeA.setAttribute('transform', `rotate(${(16 * close).toFixed(2)} 200 200)`);
         bladeB.setAttribute('transform', `rotate(${(-16 * close).toFixed(2)} 200 200)`);
         const snip = Math.floor((t + SNIP / 2) / SNIP);                 // the moment the blades meet
         if (lastSnip !== null && snip !== lastSnip) {
-          const fwd = ang + Math.PI / 2, tool = sc.offsetWidth;
+          const fwd = ang + Math.PI / 2, tool = toolSize;
           spark(x + Math.cos(fwd) * tool * .36, y + Math.sin(fwd) * tool * .36, ang);
         }
         lastSnip = snip;

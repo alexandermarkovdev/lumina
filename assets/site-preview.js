@@ -85,7 +85,7 @@
     try{screen.frame.contentDocument?.documentElement.toggleAttribute('data-lumina-thumbnail',passive);}catch{}
   }
   function prepareDocument(screen,doc){
-    // Embedding adapters live here: the imported site's files stay byte-identical.
+    // Shared adapters live here; site-specific preview fixes stay in the imported copy.
     setThumbnail(screen,!dialog.open||state.screen!==screen);
     if(!doc.getElementById('lumina-tour-style')){
       const style=doc.createElement('style');style.id='lumina-tour-style';
@@ -225,7 +225,8 @@
     frame.addEventListener('load',()=>{screen.resettingHome=false;screen.el.dataset.loads=String(Number(screen.el.dataset.loads||0)+1);checking=false;check();});
     frame.addEventListener('error',fail);
     const url=new URL(screen.project.url,document.baseURI);
-    url.searchParams.set('lumina-revision',url.pathname.includes('/razor/')?'preview-input-9':'launch-3');
+    url.searchParams.set('lumina-revision',url.pathname.includes('/razor/')?'razor-smooth-10':'launch-3');
+    if(screen.project.smoothTour&&!interactive)url.searchParams.set('lumina-thumbnail','1');
     if(screen.project.previewParam)url.searchParams.set(screen.project.previewParam,'1');
     frame.src=url.href;screen.display.append(frame);
     screen.poll=setInterval(check,30);screen.timer=setTimeout(fail,15000);
@@ -432,22 +433,28 @@
     if(!rotation.started&&!beginTour()){document.body.dataset.previewTour='loading';return;}
     if(rotation.last)rotation.elapsed+=now-rotation.last;
     rotation.last=now;
-    // Small screens share a 30fps tour clock, avoiding three scroll layouts at 60/120Hz.
-    if(compactPreview()&&rotation.painted&&now-rotation.painted<32){rotation.frame=requestAnimationFrame(tourFrame);return;}
+    // Razor's long page needs smaller scroll steps. Its lightweight thumbnail
+    // assets allow 60fps; retain the existing 30fps limit for other mobile tours.
+    const minFrame=registry.get(active).smoothTour?16:compactPreview()?32:0;
+    if(rotation.painted&&now-rotation.painted<minFrame){rotation.frame=requestAnimationFrame(tourFrame);return;}
     rotation.painted=now;
     const hold=registry.get(active).presentation==='jtn-doors'?4800:1800;
     const progress=Math.max(0,Math.min(1,(rotation.elapsed-hold)/(rotation.interval-hold-1000)));
     // A short acceleration/deceleration around an otherwise steady pan.
     const ramp=.06,p=progress<ramp?progress*progress/(2*ramp*(1-ramp)):progress>1-ramp?1-(1-progress)**2/(2*ramp*(1-ramp)):(progress-ramp/2)/(1-ramp);
-    document.body.dataset.previewTour=rotation.elapsed<hold?'intro':progress<1?'scrolling':'footer';
+    const phase=rotation.elapsed<hold?'intro':progress<1?'scrolling':'footer';
+    if(document.body.dataset.previewTour!==phase)document.body.dataset.previewTour=phase;
+    const scrolls=[];
     screens.forEach(s=>{
       if(s.project.id!==active||!s.ready)return;
       try{
         const win=s.frame.contentWindow,root=win.document.scrollingElement;
         const end=Math.max(0,root.scrollHeight-win.innerHeight),start=Math.min(s.tourStart||0,end);
-        win.scrollTo({left:0,top:start+(end-start)*p,behavior:'instant'});
+        scrolls.push({win,top:start+(end-start)*p});
       }catch{}
     });
+    // Finish layout reads in every document before moving any viewport.
+    scrolls.forEach(({win,top})=>win.scrollTo({left:0,top,behavior:'instant'}));
     if(rotation.elapsed>=rotation.interval){advance(1,true);return;}
     rotation.frame=requestAnimationFrame(tourFrame);
   }

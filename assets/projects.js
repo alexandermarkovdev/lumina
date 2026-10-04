@@ -7,6 +7,7 @@ window.LUMINA_PROJECTS = [
     url: 'sites/razor/index.html',
     liveUrl: 'https://barbershoprazor.com/',
     previewParam: 'lumina-preview',
+    smoothTour: true,
     readySelector: 'main',
     background: '#191c1e',
     modes: {
