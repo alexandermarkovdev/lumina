@@ -1,8 +1,7 @@
 /* The selected Lumina direction: clear copy on the existing photographic scenes. */
 .lm-menu{position:fixed;inset:0;width:100%;max-width:none;height:100%;height:100dvh;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--ink);overflow:hidden;overscroll-behavior:none}
 .lm-menu[open]{display:flex;justify-content:flex-end}
-.lm-menu::backdrop{background:rgba(25,35,38,.42);animation:lm-menu-shade-in 220ms ease-out both}
-.lm-menu.is-closing::backdrop{animation:lm-menu-shade-out 220ms ease-in both}
+.lm-menu::backdrop{background:rgba(25,35,38,.42)}
 .lm-menu-panel{box-sizing:border-box;width:min(88vw,420px);height:100%;display:flex;flex-direction:column;gap:36px;padding:max(22px,env(safe-area-inset-top)) 28px max(30px,env(safe-area-inset-bottom));background:var(--paper);box-shadow:-12px 0 36px rgba(25,35,38,.12);overflow-y:auto;overscroll-behavior:contain}
 .lm-menu-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .lm-menu-header .logo{font-size:26px}
@@ -14,15 +13,12 @@
 .lm-menu-contact a{display:flex;align-items:center;min-height:44px;font:400 14px/1.5 var(--sans);text-decoration:none}
 .lm-menu :focus-visible{outline:2px solid var(--ink);outline-offset:5px}
 html.lm-menu-open,html.lm-menu-open body{overflow:hidden;overscroll-behavior:none}
-@keyframes lm-menu-shade-in{from{opacity:0}to{opacity:1}}
-@keyframes lm-menu-shade-out{from{opacity:1}to{opacity:0}}
 @media(max-width:900px){
  .lm-main>.site-header{justify-content:space-between}
  .lm-main>.site-header>.navigation{display:none}
  .lm-main>.site-header>.menu-toggle{display:flex;align-items:center;gap:12px;min-height:48px;padding:12px 0 12px 16px;border:0;background:transparent;color:inherit;font:400 12px/1 var(--sans);cursor:pointer}
 }
 @media(max-height:600px){.lm-menu-panel{gap:16px}.lm-menu-links a{min-height:48px;font-size:30px;padding:4px 0}.lm-menu-contact{padding-top:12px}}
-@media(prefers-reduced-motion:reduce){.lm-menu::backdrop,.lm-menu.is-closing::backdrop{animation:none}}
 .lm-main{padding-bottom:0}
 .lm-main>.site-header>.logo{font-size:clamp(30px,3.2vw,42px);flex-shrink:0}
 .scene-preview-hint svg{display:block;width:2cqw;height:2cqw;margin-top:.6cqw;stroke-width:1}
