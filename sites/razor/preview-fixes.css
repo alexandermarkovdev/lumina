@@ -23,3 +23,8 @@ html[data-lumina-preview]::-webkit-scrollbar{display:none}
   html[data-lumina-preview] .hero-copy{max-width:none}
   html[data-lumina-preview] .hero-rule{width:100%;max-width:none}
 }
+
+/* Embedded previews do not need a full-screen animated noise texture. On high-DPR
+   phones its oversized fixed layer is rasterized separately in every iframe. */
+html[data-lumina-preview] body::after{content:none!important;display:none!important;animation:none!important;background-image:none!important}
+html[data-lumina-preview] .site-header.is-scrolled{-webkit-backdrop-filter:none;backdrop-filter:none}

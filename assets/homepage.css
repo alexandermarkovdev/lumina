@@ -101,3 +101,6 @@
 }
 @media(min-width:701px) and (max-width:900px){.lm-main .chapter{padding-top:55px;padding-bottom:55px}}
 @media(max-width:359px){.lm-main .landing-copy,.lm-main .chapter{padding-left:20px;padding-right:20px}.lm-main .landing-actions{flex-direction:row}.lm-main .landing-actions .button{width:auto;font-size:10px}.lm-main .lp-showcase-actions{gap:0}.lm-main .lp-hero-link{font-size:11px}}
+
+/* Explicit clipping bounds iframe compositing on mobile WebKit. */
+@media(max-width:1000px),(pointer:coarse){.lp-glass,.lp-display{overflow:hidden;contain:paint}.lp-viewer:not([open]) .lp-hardware{box-shadow:none}}

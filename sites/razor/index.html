@@ -697,7 +697,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
   // Theme before first paint: the visitor's saved choice, otherwise dark
   (function(){var t;try{t=localStorage.getItem('razor-theme')}catch(e){}document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')})();
 </script>
-<script>if(new URLSearchParams(location.search).has("lumina-preview"))document.documentElement.setAttribute("data-lumina-preview","");</script><link rel="stylesheet" href="preview-fixes.css"></head>
+<script>if(new URLSearchParams(location.search).has("lumina-preview"))document.documentElement.setAttribute("data-lumina-preview","");</script><link rel="stylesheet" href="preview-fixes.css?v=launch-3"></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 L8.12 15.88"/><path d="M14.47 14.48 L20 20"/><path d="M8.12 8.12 L12 12"/></symbol>
@@ -1441,12 +1441,15 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
       // Keep the orbit's phase when a device is hidden or its hero scrolls
       // away. A resumed preview continues from the last painted position.
       let running = false, lastSnip = null, elapsed = 0, lastFrame = null, raf = 0;
-      let onScreen = false;
+      let onScreen = false, lastPaint = 0;
+      const embeddedOrbit=document.documentElement.hasAttribute('data-lumina-preview');
       const orbitMotion = matchMedia('(prefers-reduced-motion: reduce)');
       const frame = now => {
         if (!running) return;
         if (lastFrame !== null) elapsed += now - lastFrame;
         lastFrame = now;
+        if(embeddedOrbit&&now-lastPaint<33){raf=requestAnimationFrame(frame);return;}
+        lastPaint=now;
         const t = elapsed, a = (t % LAP) / LAP * TAU, ang = a - Math.PI / 2, R = w / 2 + gap;
         const x = w / 2 + R * Math.cos(ang), y = h / 2 + R * Math.sin(ang);
         sc.style.left = x + 'px'; sc.style.top = y + 'px';

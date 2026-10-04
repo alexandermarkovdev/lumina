@@ -218,6 +218,7 @@
     frame.addEventListener('load',()=>{screen.resettingHome=false;screen.el.dataset.loads=String(Number(screen.el.dataset.loads||0)+1);checking=false;check();});
     frame.addEventListener('error',fail);
     const url=new URL(screen.project.url,document.baseURI);
+    url.searchParams.set('lumina-revision','launch-3');
     if(screen.project.previewParam)url.searchParams.set(screen.project.previewParam,'1');
     frame.src=url.href;screen.display.append(frame);
     screen.poll=setInterval(check,30);screen.timer=setTimeout(fail,15000);
@@ -259,7 +260,11 @@
     if(changed&&!dialog.open)restartTour({keepView:rotation.keepView});
     // Release first, then load: switching never temporarily doubles memory.
     screens.forEach(s=>{if(!wanted.has(s))releaseScreen(s);});
-    wanted.forEach(s=>{if(!s.frame)loadScreen(s);});
+    if(compactPreview()){
+      // Decode one document at a time to avoid three simultaneous GPU/image allocations.
+      const waiting=[...wanted].some(s=>s.frame&&!s.ready&&!s.failed);
+      if(!waiting){const next=[...wanted].find(s=>!s.frame);if(next)loadScreen(next);}
+    }else wanted.forEach(s=>{if(!s.frame)loadScreen(s);});
     devices.forEach(d=>d.box.classList.toggle('is-live',!!screens.get(active+'/'+d.mode)?.ready));
   }
   function place(screen, box, clip='none') {
@@ -393,8 +398,8 @@
   }
   function canTour(){return registry.size>1&&!rotation.paused&&!rotation.holds.size&&!dialog.open&&!document.hidden;}
   function beginTour(){
-    const current=[...screens.values()].filter(s=>s.project.id===active&&s.frame);
-    if(!current.length)return false;
+    const current=MODES.map(mode=>getScreen(registry.get(active),mode));
+    if(current.some(s=>!s.frame))return false;
     if(!current.every(s=>(s.ready||s.failed)&&!s.resettingHome))return false;
     if(!rotation.keepView)current.forEach(s=>resetPreview(s,true));
     if(current.some(s=>s.resettingHome))return false;
@@ -588,7 +593,7 @@
   },{passive:true});
   document.addEventListener('visibilitychange',scheduleRotation);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches){rotation.paused=true;scheduleRotation();}});
-  const rotationRegions=[document.querySelector('.landing'),document.querySelector('#projects')].filter(Boolean);
+  const rotationRegions=[document.querySelector('.landing-art'),document.querySelector('#projects .scene-art')].filter(Boolean);
   const visibleRegions=new Set();rotation.holds.add('offscreen');
   const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{entry.isIntersecting?visibleRegions.add(entry.target):visibleRegions.delete(entry.target);});holdRotation('offscreen',!visibleRegions.size);},{threshold:.05});rotationRegions.forEach(region=>observer.observe(region));
   document.addEventListener('focusin',()=>{const el=document.activeElement;holdRotation('focus',!!el?.closest('.landing,#projects')&&!el.closest('.lp-rotation-controls'));});
