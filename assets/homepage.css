@@ -39,6 +39,7 @@
 .lm-contact-form[hidden]{display:none}
 .scene-print{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply;fill:#282720}
 .contact-card-print .card-wordmark{font-family:var(--sans);font-size:18px;letter-spacing:3px}
+.lm-main :is(#services,#businesses) .prop-note .logo{font-size:1.12cqw}
 .contact-card-print .card-phone{font-family:var(--serif);font-size:21px}
 .contact-card-print .card-email{font-family:var(--sans);font-size:12px;letter-spacing:.2px}
 .router-book-print text{font-family:var(--serif);font-size:185px;font-weight:500;fill:#343028;opacity:.92}
