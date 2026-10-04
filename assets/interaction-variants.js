@@ -85,9 +85,11 @@
     const b=button(esc(old.textContent)+arrow,'scene-label sans scene-book lv-book',()=>topic(books[i],b));
     b.setAttribute('style',old.getAttribute('style'));b.setAttribute('aria-label',books[i].title+' — разгледай');old.replaceWith(b);
   });
-  const shortcuts=element('div','lv-topic-links');shortcuts.setAttribute('aria-label','Разгледай темите');
-  books.forEach(r=>{const b=button(esc(r.title)+arrow,'',()=>topic(r,b));shortcuts.append(b);});
-  $('.landing-copy').append(shortcuts);
+  if(!mainPage){
+    const shortcuts=element('div','lv-topic-links');shortcuts.setAttribute('aria-label','Разгледай темите');
+    books.forEach(r=>{const b=button(esc(r.title)+arrow,'',()=>topic(r,b));shortcuts.append(b);});
+    $('.landing-copy').append(shortcuts);
+  }
   const sentence=$('.landing-description');
   [['да бъде открит',0],['да вдъхва доверие',1],['да върви напред',2]].forEach(([phrase,i])=>{sentence.innerHTML=sentence.innerHTML.replace(phrase,`<button class="lv-word-link" data-outcome="${i}">${phrase}</button>`);});
   sentence.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>topic(outcomes[Number(b.dataset.outcome)],b)));
@@ -238,7 +240,7 @@
   if(!$('#contact-links')){const slot=element('div','');slot.id='contact-links';slot.hidden=true;contactContent.append(slot);}
   }
 
-  if(variant==='explorer'){
+  if(variant==='explorer'&&!mainPage){
     const search=button('Намери в сайта '+arrow,'lv-search-open',openSearch);$('.landing-copy').append(search);
     function openSearch(){
       show({title:'Какво търсите?',body:'',section:'search'},search,'search');
