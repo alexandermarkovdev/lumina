@@ -52,7 +52,7 @@
  .lm-main #projects .lv-tab-panel{min-height:240px}
 }
 
-/* Mobile composition: copy and live work, without detached photographic sections. */
+/* Mobile composition: the original scenes cropped into the copy and live work. */
 .lp-mobile-project-device{display:none}
 @media(max-width:900px){
  .lm-main .landing-frame{padding-top:100px;display:flex;gap:0}
@@ -63,19 +63,27 @@
  .lm-main .landing-actions{margin-top:22px;gap:10px}
  .lm-main .landing-actions .button{min-height:46px}
  .lm-main .lp-showcase-actions{gap:0 8px;margin-top:12px;justify-content:space-between}
- .lm-main .landing-art{order:2;margin:24px auto 0;width:calc(100% - 32px);max-width:650px;height:clamp(250px,64vw,410px);mask-image:none;overflow:hidden}
- .lm-main .landing .scene{position:relative;inset:auto;width:100%;height:100%;max-width:none;transform:none;aspect-ratio:auto}
- .lm-main .landing .scene> :not(.lp-device){display:none}
- .lm-main .landing .lp-device--desktop,.lm-main #projects .lp-mobile-project-device.lp-device--desktop{left:9%;top:2%;width:78%}
- .lm-main .landing .lp-device--tablet,.lm-main #projects .lp-mobile-project-device.lp-device--tablet{left:1%;top:35%;width:27%}
- .lm-main .landing .lp-device--mobile,.lm-main #projects .lp-mobile-project-device.lp-device--mobile{left:79%;top:37%;width:18%}
+ .lm-main .landing-art{order:2;margin:12px auto 0;width:100%;max-width:698px;height:auto;aspect-ratio:1.14;mask-image:none;overflow:hidden}
+ .lm-main .landing .scene{position:absolute;inset:auto;width:220%;height:auto;left:-96%;top:-24%;max-width:none;transform:none;aspect-ratio:1672/941}
+ .lm-main .landing .scene> :not(.lp-device):not(.scene-photo){display:none}
+ .lm-main .landing .scene>.scene-photo{display:block}
+ .lm-main .landing .lp-device--desktop,.lm-main #projects .lp-mobile-project-device.lp-device--desktop{left:53.4689%;top:38.7885%;width:23.9234%}
+ .lm-main .landing .lp-device--tablet,.lm-main #projects .lp-mobile-project-device.lp-device--tablet{left:43.6005%;top:59.2986%;width:9.6292%}
+ .lm-main .landing .lp-device--mobile,.lm-main #projects .lp-mobile-project-device.lp-device--mobile{left:78.0502%;top:59.7247%;width:5.9809%}
  .lm-main .chapter{display:block;min-height:0;padding:44px 24px;background:var(--paper)}
  .lm-main .chapter-content{padding:0;width:100%;max-width:650px;margin:auto}
- .lm-main .chapter .scene-art{display:none}
+ .lm-main .chapter:not(#projects){display:grid;grid-template-columns:minmax(0,650px);justify-content:center;padding-top:16px}
+ .lm-main .chapter:not(#projects) .chapter-content{display:contents}
+ .lm-main .chapter:not(#projects) .chapter-content>*{position:relative;z-index:1}
+ .lm-main .chapter:not(#projects) .scene-art{display:block;position:relative;inset:auto;grid-area:1/1;order:initial;width:calc(100% + 48px);height:clamp(200px,53vw,350px);margin:0 -24px;mask-image:none;overflow:hidden}
+ .lm-main .chapter:not(#projects) .scene-canvas{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;transform:none}
+ .lm-main .chapter:not(#projects) .scene-photo{object-fit:cover;object-position:center;mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 78%,transparent)}
+ .lm-main .chapter:not(#projects) .prop-note{display:none}
+ .lm-main .chapter:not(#projects) h2{grid-area:1/1;align-self:center;width:58%;font-size:clamp(29px,8.8vw,52px);line-height:1.08;text-wrap:initial;padding-bottom:12px}
  .lm-main .chapter h2{font-size:clamp(39px,10.2vw,60px);line-height:1.06}
  .lm-main .chapter .lead{font-size:18px;line-height:1.6;margin-top:20px}
  .lm-main .chapter .body-copy,.lm-main .lm-copy-item p{font-size:15px;line-height:1.8;max-width:none}
- .lm-main .chapter+.chapter{border-top:1px solid #d8d0c2}
+ .lm-main .chapter+.chapter{border-top:0}
  .lm-main .lm-copy-list{gap:24px;margin-top:28px}
  .lm-main .lm-copy-item h3{font-size:27px}
  .lm-main .lv-tabs--chips .lv-tab-panel{min-height:0;padding:20px 0 0;background:none}
@@ -87,10 +95,13 @@
  .lm-main #projects .chapter-content{display:contents}
  .lm-main #projects h2{order:-3}
  .lm-main #projects .chapter-content>.body-copy{order:-2}
- .lm-main #projects .scene-art{display:block;position:relative;inset:auto;order:-1;height:clamp(250px,64vw,410px);width:100%;margin:24px 0 12px;overflow:hidden;mask-image:none}
- .lm-main #projects .scene-canvas{position:relative;inset:auto;transform:none;width:100%;height:100%;aspect-ratio:auto}
- .lm-main #projects .scene-canvas>.scene-photo,.lm-main #projects .lp-device--scene{display:none}
+ .lm-main #projects .scene-art{display:block;position:relative;inset:auto;order:-1;height:auto;aspect-ratio:1.14;width:calc(100% + 48px);margin:12px -24px 20px;overflow:hidden;mask-image:none}
+ .lm-main #projects .scene-canvas{position:absolute;inset:auto;transform:none;width:220%;height:auto;left:-96%;top:-24%;aspect-ratio:1672/941}
+ .lm-main #projects .scene-canvas picture{display:contents}
+ .lm-main #projects .scene-photo{display:block;object-fit:fill;mask-image:none}
+ .lm-main #projects .lp-device--scene{display:none}
  .lm-main #projects .lp-mobile-project-device{display:block}
+ .lm-main .landing-art::after,.lm-main #projects .scene-art::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,var(--paper),transparent 10%,transparent 88%,var(--paper))}
  .lm-main #projects .lv-tab-panel{min-height:0;padding-bottom:0}
  .lm-main #projects .lv-tab-panel p{max-width:none}
  .lm-main #projects .lv-tabs{margin-top:0}
@@ -99,7 +110,7 @@
  .lp-backdrop{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(34,32,28,.76)}
  .lp-segment,.lp-close{-webkit-backdrop-filter:none;backdrop-filter:none}
 }
-@media(min-width:701px) and (max-width:900px){.lm-main .chapter{padding-top:55px;padding-bottom:55px}}
+@media(min-width:701px) and (max-width:900px){.lm-main .chapter{padding-bottom:55px}.lm-main #projects{padding-top:55px}}
 @media(max-width:359px){.lm-main .landing-copy,.lm-main .chapter{padding-left:20px;padding-right:20px}.lm-main .landing-actions{flex-direction:row}.lm-main .landing-actions .button{width:auto;font-size:10px}.lm-main .lp-showcase-actions{gap:0}.lm-main .lp-hero-link{font-size:11px}}
 
 /* Explicit clipping bounds iframe compositing on mobile WebKit. */
