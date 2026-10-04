@@ -64,7 +64,7 @@
  .lm-main .landing-description{font-size:15px;line-height:1.7;margin-top:18px}
  .lm-main .landing-actions{margin-top:22px;gap:10px}
  .lm-main .landing-actions .button{min-height:46px}
- .lm-main .lp-showcase-actions{gap:0 8px;margin-top:12px;justify-content:space-between}
+ .lm-main .lp-showcase-actions{display:none}
  .lm-main .landing-art{order:2;margin:12px auto 0;width:100%;max-width:698px;height:auto;aspect-ratio:1.14;mask-image:none;overflow:hidden}
  .lm-main .landing .scene{position:absolute;inset:auto;width:220%;height:auto;left:-96%;top:-24%;max-width:none;transform:none;aspect-ratio:1672/941}
  .lm-main .landing .scene> :not(.lp-device):not(.scene-photo):not(.scene-preview-hint){display:none}

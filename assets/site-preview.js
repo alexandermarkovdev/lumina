@@ -15,7 +15,7 @@
   const compactPreview = () => innerWidth <= 1000 || matchMedia('(pointer: coarse)').matches;
   const autoMode = () => innerWidth <= 600 ? 'mobile' : innerWidth <= 1000 ? 'tablet' : 'desktop';
   const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 12L12 4M5 4h7v7"/></svg>';
-  let active, heroButton, resizeQueued = false;
+  let active, heroButton, resizeQueued = false, returnTimer = 0;
   const rotation={frame:0,paused:!motion(),holds:new Set(),controls:[],interval:15000,elapsed:0,last:0,started:false,keepView:false,resuming:false,focusBypass:null,project:null};
   const state = {project:null, mode:'desktop', opener:null, screen:null, source:null, closing:false, seq:0, saved:null};
   function register(project) {
@@ -257,7 +257,7 @@
     screen.el.classList.remove('is-live');
   }
   function syncScreens() {
-    const show=dialog.open||(!document.hidden&&!rotation.holds.has('offscreen'));
+    const show=dialog.open||(!document.hidden&&!rotation.holds.has('offscreen')&&!rotation.holds.has('viewer-return'));
     const wanted=new Set();
     if(show){
       const modes=dialog.open?[state.mode]:MODES;
@@ -530,6 +530,7 @@
   }
   function open(id=active,mode=autoMode(),opener=document.activeElement) {
     if(dialog.open||!registry.has(id))return;
+    clearTimeout(returnTimer);rotation.holds.delete('viewer-return');
     if(id!==active)select(id);
     stopTour();document.body.dataset.previewRotation='paused';
     state.project=registry.get(id);state.mode=MODES.includes(mode)?mode:autoMode();state.screen=getScreen(state.project,state.mode);state.opener=opener;state.closing=false;++state.seq;
@@ -541,13 +542,15 @@
     dialog.querySelector('#lp-title').textContent=state.project.name+' — преглед на сайта';
     dialog.inert=false;dialog.removeAttribute('aria-hidden');dialog.showModal();syncScreens();layoutViewer();V.close.focus({preventScroll:true});screens.forEach(restoreScroll);
     state.screen.presentation?.run({cursor:false});
-    if(motion()&&visible(from))animateFrom(state.screen,from,rect(state.screen.el),600);
+    if(!compactPreview()&&motion()&&visible(from))animateFrom(state.screen,from,rect(state.screen.el),600);
     else state.screen.el.animate({opacity:[0,1]},{duration:150});
     V.backdrop.animate({opacity:[0,1]},{duration:motion()?420:150});
     V.toolbar.animate({opacity:[0,1],transform:motion()?['translateY(-6px)','none']:['none','none']},{duration:220,easing:EASE});
   }
   function cleanup() {
     if(dialog.open||!state.project)return;
+    const compact=compactPreview();
+    if(compact)rotation.holds.add('viewer-return');
     ++state.seq;cancelAnimations();screens.forEach(s=>s.presentation?.stop());
     document.documentElement.style.overflow=state.saved.overflow;
     const saved=state.saved,returnPosition={left:saved.x,top:saved.y};
@@ -564,20 +567,32 @@
       screens.forEach(restoreScroll);window.scrollTo({...returnPosition,behavior:'instant'});layoutThumbnails();
     };
     history.replaceState(history.state,'',location.pathname+location.search+saved.hash);
+    if(compact){
+      // Retire the expanded iframe before re-creating the three small views.
+      // Avoid overlapping live iframe scale animations and decoded page layers.
+      restartTour({keepView:true});scheduleRotation();
+      window.scrollTo({...returnPosition,behavior:'instant'});layoutThumbnails();
+      clearTimeout(returnTimer);
+      returnTimer=setTimeout(()=>{
+        if(dialog.open||state.seq!==closedVersion)return;
+        rotation.holds.delete('viewer-return');scheduleRotation();queueLayout();
+      },250);
+      return;
+    }
     resetLanding();
     // Native dialog focus restoration and scroll anchoring finish after close.
-    requestAnimationFrame(()=>{resetLanding();requestAnimationFrame(()=>{resetLanding();restartTour({keepView:true});scheduleRotation();});});
+    requestAnimationFrame(()=>{resetLanding();requestAnimationFrame(()=>{if(dialog.open||state.seq!==closedVersion)return;resetLanding();restartTour({keepView:true});scheduleRotation();});});
   }
   async function close() {
     if(!dialog.open||state.closing)return;
     state.closing=true;const seq=++state.seq,screen=state.screen,from=rect(screen.el);
-    cancelAnimations();rememberScroll(screen);screen.frame.inert=true;
+    cancelAnimations();rememberScroll(screen);if(screen.frame)screen.frame.inert=true;
     const device=deviceFor(screen),target=device?rect(device.box):null;
     let animation;
-    if(motion()&&visible(target)){
+    if(!compactPreview()&&motion()&&visible(target)){
       place(screen,target);animation=animateFrom(screen,from,target,380);
     }else animation=screen.el.animate({opacity:[1,0]},{duration:150,fill:'forwards'});
-    V.toolbar.animate({opacity:[1,0]},{duration:150,fill:'forwards'});V.backdrop.animate({opacity:[1,0]},{duration:motion()?380:150,fill:'forwards'});
+    V.toolbar.animate({opacity:[1,0]},{duration:150,fill:'forwards'});V.backdrop.animate({opacity:[1,0]},{duration:!compactPreview()&&motion()?380:150,fill:'forwards'});
     await Promise.race([animation.finished.catch(()=>{}),new Promise(r=>setTimeout(r,500))]);
     if(seq===state.seq){dialog.close();cleanup();}
   }
