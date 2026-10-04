@@ -1,5 +1,6 @@
 /* The selected Lumina direction: clear copy on the existing photographic scenes. */
 .lm-main{padding-bottom:0}
+.lm-main>.site-header>.logo{font-size:clamp(30px,3.2vw,42px);flex-shrink:0}
 .scene-preview-hint svg{display:block;width:2cqw;height:2cqw;margin-top:.6cqw;stroke-width:1}
 .lm-main .lp-hero-link>svg{transform:rotate(135deg)}
 .lm-main .chapter h2{text-wrap:balance}
