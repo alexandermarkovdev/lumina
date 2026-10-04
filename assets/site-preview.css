@@ -57,6 +57,9 @@ html{scrollbar-gutter:stable}
 .lp-surface.is-live iframe{opacity:1}
 .lp-surface.is-live .lp-poster{opacity:0}
 .lp-viewer[open] .lp-surface{z-index:2;pointer-events:auto}
+/* The scene is a click target; only an opened device accepts website input. */
+.lp-viewer:not([open]) .lp-surface,.lp-viewer:not([open]) .lp-surface *{pointer-events:none!important}
+.lp-device>button{touch-action:pan-y pinch-zoom}
 .lp-status{position:absolute;left:0;top:0;width:100%;height:var(--device-top);display:flex;align-items:center;justify-content:space-between;padding:4px 31px 0;font:600 15px/1 system-ui,sans-serif;box-sizing:border-box;pointer-events:none;font-variant-numeric:tabular-nums}
 .lp-status svg{width:66px;height:16px}
 .lp-island{position:absolute;left:50%;top:12px;translate:-50% 0;width:120px;height:34px;border-radius:24px;background:#020303;pointer-events:none}

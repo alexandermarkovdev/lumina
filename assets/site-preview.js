@@ -225,7 +225,7 @@
     frame.addEventListener('load',()=>{screen.resettingHome=false;screen.el.dataset.loads=String(Number(screen.el.dataset.loads||0)+1);checking=false;check();});
     frame.addEventListener('error',fail);
     const url=new URL(screen.project.url,document.baseURI);
-    url.searchParams.set('lumina-revision','launch-3');
+    url.searchParams.set('lumina-revision',url.pathname.includes('/razor/')?'preview-input-9':'launch-3');
     if(screen.project.previewParam)url.searchParams.set(screen.project.previewParam,'1');
     frame.src=url.href;screen.display.append(frame);
     screen.poll=setInterval(check,30);screen.timer=setTimeout(fail,15000);

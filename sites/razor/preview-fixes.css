@@ -28,3 +28,8 @@ html[data-lumina-preview]::-webkit-scrollbar{display:none}
    phones its oversized fixed layer is rasterized separately in every iframe. */
 html[data-lumina-preview] body::after{content:none!important;display:none!important;animation:none!important;background-image:none!important}
 html[data-lumina-preview] .site-header.is-scrolled{-webkit-backdrop-filter:none;backdrop-filter:none}
+/* Keep the scissors, but avoid large image-mask repaints in the three small tours. */
+html[data-lumina-thumbnail] [data-clip] img,
+html[data-lumina-thumbnail] .map[data-clip]{clip-path:none;transition:none}
+html[data-lumina-thumbnail] [data-reveal]{translate:none;transition:opacity .35s ease}
+html[data-lumina-thumbnail] .float-cta{display:none}

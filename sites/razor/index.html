@@ -697,7 +697,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
   // Theme before first paint: the visitor's saved choice, otherwise dark
   (function(){var t;try{t=localStorage.getItem('razor-theme')}catch(e){}document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')})();
 </script>
-<script>if(new URLSearchParams(location.search).has("lumina-preview"))document.documentElement.setAttribute("data-lumina-preview","");</script><link rel="stylesheet" href="preview-fixes.css?v=launch-3"></head>
+<script>if(new URLSearchParams(location.search).has("lumina-preview"))document.documentElement.setAttribute("data-lumina-preview","");</script><link rel="stylesheet" href="preview-fixes.css?v=preview-input-9"></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 L8.12 15.88"/><path d="M14.47 14.48 L20 20"/><path d="M8.12 8.12 L12 12"/></symbol>
@@ -1354,7 +1354,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
     new IntersectionObserver((entries, io) => {
       if (!entries[0].isIntersecting) return;
       io.disconnect();
-      if (reduced()) return;
+      if (reduced() || root.hasAttribute('data-lumina-thumbnail')) return;
       $$('[data-to]', stats).forEach((n, k) => {
         const to = parseFloat(n.dataset.to), dec = +(n.dataset.dec || 0), suffix = n.dataset.suffix || '';
         const fmt = v => v.toFixed(dec).replace('.', ',');
@@ -1387,6 +1387,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:150;pointer-events:none
     let pillQueued = false;
     const refreshFloat = () => {
       pillQueued = false;
+      if (root.hasAttribute('data-lumina-thumbnail')) return;
       const vh = innerHeight;
       const heroGone = heroActions.getBoundingClientRect().bottom < 0;
       const b = bookingEl.getBoundingClientRect(), bookingOn = b.top < vh * .85 && b.bottom > vh * .15;

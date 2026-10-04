@@ -31,7 +31,7 @@
 .lm-main .contact-pending{font-size:14px;line-height:1.8}
 .lm-contact-form{display:grid;gap:17px;margin-top:28px;max-width:500px}
 .lm-contact-form label{display:grid;gap:7px;font:400 13px/1.5 var(--sans)}
-.lm-contact-form input,.lm-contact-form textarea{width:100%;border:1px solid #aaa293;background:#f7f3eb;color:var(--ink);padding:12px;font:400 15px/1.6 var(--sans);border-radius:0}
+.lm-contact-form input,.lm-contact-form textarea{width:100%;border:1px solid #aaa293;background:#f7f3eb;color:var(--ink);padding:12px;font:400 16px/1.6 var(--sans);border-radius:0}
 .lm-contact-form textarea{resize:vertical;min-height:105px}
 .lm-contact-form .button{border:0;justify-content:center;cursor:pointer}
 .lm-contact-form [role=status],.lm-contact-form .lm-form-help{font:400 12px/1.7 var(--sans);color:var(--muted);margin:0}
@@ -120,3 +120,9 @@
 
 /* Explicit clipping bounds iframe compositing on mobile WebKit. */
 @media(max-width:1000px),(pointer:coarse){.lp-glass,.lp-display{overflow:hidden;contain:paint}.lp-viewer:not([open]) .lp-hardware{box-shadow:none}}
+/* A fine rim remains legible against the pale mobile scene, without a costly blur. */
+@media(max-width:900px){
+ .lp-viewer:not([open]) .lp-hardware{outline:1px solid #827c72}
+ .lp-viewer .lp-surface.is-scene-screen .lp-glass,.lp-scene-plane{border-radius:14px}
+ .lp-viewer .lp-surface.is-scene-screen .lp-glass::after,.lp-scene-plane::after{content:"";position:absolute;inset:0;z-index:2;border:5px solid #c2b7a6;border-bottom-width:9px;border-radius:14px;box-shadow:inset 0 0 0 2px #68675f;pointer-events:none}
+}
