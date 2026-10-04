@@ -1,5 +1,7 @@
 /* The selected Lumina direction: clear copy on the existing photographic scenes. */
 .lm-main{padding-bottom:0}
+.scene-preview-hint svg{display:block;width:2cqw;height:2cqw;margin-top:.6cqw;stroke-width:1}
+.lm-main .lp-hero-link>svg{transform:rotate(135deg)}
 .lm-main .chapter h2{text-wrap:balance}
 .lm-main .lm-copy-list{display:grid;gap:25px;margin-top:30px}
 .lm-copy-item h3{font:500 28px/1.12 var(--serif);letter-spacing:-.02em;margin:0 0 8px}
@@ -65,8 +67,9 @@
  .lm-main .lp-showcase-actions{gap:0 8px;margin-top:12px;justify-content:space-between}
  .lm-main .landing-art{order:2;margin:12px auto 0;width:100%;max-width:698px;height:auto;aspect-ratio:1.14;mask-image:none;overflow:hidden}
  .lm-main .landing .scene{position:absolute;inset:auto;width:220%;height:auto;left:-96%;top:-24%;max-width:none;transform:none;aspect-ratio:1672/941}
- .lm-main .landing .scene> :not(.lp-device):not(.scene-photo){display:none}
+ .lm-main .landing .scene> :not(.lp-device):not(.scene-photo):not(.scene-preview-hint){display:none}
  .lm-main .landing .scene>.scene-photo{display:block}
+ .lm-main .landing .scene>.scene-preview-hint{display:block}
  .lm-main .landing .lp-device--desktop,.lm-main #projects .lp-mobile-project-device.lp-device--desktop{left:53.4689%;top:38.7885%;width:23.9234%}
  .lm-main .landing .lp-device--tablet,.lm-main #projects .lp-mobile-project-device.lp-device--tablet{left:43.6005%;top:59.2986%;width:9.6292%}
  .lm-main .landing .lp-device--mobile,.lm-main #projects .lp-mobile-project-device.lp-device--mobile{left:78.0502%;top:59.7247%;width:5.9809%}
@@ -91,21 +94,23 @@
  .lm-main .lm-business summary{min-height:58px}
  .lm-main .lm-business summary strong{font-size:26px}
  .lm-main .lm-business summary span span{font-size:14px}
- .lm-main #projects{display:flex;flex-direction:column;gap:0;max-width:698px;margin:auto}
- .lm-main #projects .chapter-content{display:contents}
- .lm-main #projects h2{order:-3}
- .lm-main #projects .chapter-content>.body-copy{order:-2}
- .lm-main #projects .scene-art{display:block;position:relative;inset:auto;order:-1;height:auto;aspect-ratio:1.14;width:calc(100% + 48px);margin:12px -24px 20px;overflow:hidden;mask-image:none}
- .lm-main #projects .scene-canvas{position:absolute;inset:auto;transform:none;width:220%;height:auto;left:-96%;top:-24%;aspect-ratio:1672/941}
- .lm-main #projects .scene-canvas picture{display:contents}
+ .lm-main #projects{display:block;max-width:900px;margin:auto;padding:34px 12px 20px;min-height:clamp(350px,96vw,760px)}
+ .lm-main #projects .chapter-content{display:block;position:relative;z-index:2;width:23%;max-width:none;margin:0}
+ .lm-main #projects h2{font-size:clamp(23px,6vw,46px);line-height:1.06;text-wrap:initial}
+ .lm-main #projects .chapter-content>.body-copy,.lm-main #projects .lv-tab-panel{display:none}
+ .lm-main #projects .scene-art{display:block;position:absolute;inset:0;width:100%;height:100%;margin:0;overflow:hidden;mask-image:none}
+ .lm-main #projects .scene-canvas{position:absolute;inset:auto;width:140%;height:auto;left:-40%;top:0;transform:none;aspect-ratio:1672/941}
+ .lm-main #projects .scene-art::before{content:"";position:absolute;inset:0 auto 0 0;width:24%;z-index:1;pointer-events:none;background:linear-gradient(to right,var(--paper) 45%,transparent)}
  .lm-main #projects .scene-photo{display:block;object-fit:fill;mask-image:none}
- .lm-main #projects .lp-device--scene{display:none}
- .lm-main #projects .lp-mobile-project-device{display:block}
+ .lm-main #projects .lp-device--scene{display:block}
+ .lm-main #projects .lp-mobile-project-device{display:none}
  .lm-main .landing-art::after,.lm-main #projects .scene-art::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,var(--paper),transparent 10%,transparent 88%,var(--paper))}
- .lm-main #projects .lv-tab-panel{min-height:0;padding-bottom:0}
- .lm-main #projects .lv-tab-panel p{max-width:none}
- .lm-main #projects .lv-tabs{margin-top:0}
- .lm-main #projects .lp-rotation-controls{margin-top:12px}
+ .lm-main #projects .lv-tabs{margin-top:18px}
+ .lm-main #projects .lv-tab-bar{display:flex;flex-direction:column;gap:2px}
+ .lm-main #projects .lv-tab{flex:none;width:100%;min-height:46px;padding:8px 0;font-size:clamp(11px,2.65vw,15px);line-height:1.4;overflow-wrap:normal}
+ .lm-main #projects .lv-tab[aria-selected=true]{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+ .lm-main #projects .lp-rotation-controls{margin-top:10px;gap:0;flex-wrap:nowrap;width:max-content;max-width:none}
+ .lm-main #projects .lp-rotation-controls button{width:40px;min-height:44px}
  .lm-main .contact-pending{font-size:14px}
  .lp-backdrop{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(34,32,28,.76)}
  .lp-segment,.lp-close{-webkit-backdrop-filter:none;backdrop-filter:none}

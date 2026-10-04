@@ -16,7 +16,7 @@
   const autoMode = () => innerWidth <= 600 ? 'mobile' : innerWidth <= 1000 ? 'tablet' : 'desktop';
   const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 12L12 4M5 4h7v7"/></svg>';
   let active, heroButton, resizeQueued = false;
-  const rotation={frame:0,paused:!motion(),holds:new Set(),controls:[],interval:15000,elapsed:0,last:0,started:false,keepView:false,project:null};
+  const rotation={frame:0,paused:!motion(),holds:new Set(),controls:[],interval:15000,elapsed:0,last:0,started:false,keepView:false,resuming:false,focusBypass:null,project:null};
   const state = {project:null, mode:'desktop', opener:null, screen:null, source:null, closing:false, seq:0, saved:null};
   function register(project) {
     if (!project?.id || !project.name || !project.url) throw new Error('A preview needs id, name and url.');
@@ -185,13 +185,20 @@
     await Promise.race([Promise.all([doc.fonts?.ready,...images.map(img=>img.decode().catch(()=>{}))]),new Promise(resolve=>{assetTimer=setTimeout(resolve,1500);})]);
     clearTimeout(assetTimer);
     if(version!==screen.version)return;
-    if(screen.view.preserveViewOnClose&&screen.scroll.y)restoreScroll(screen);
+    const restoreSaved=(rotation.keepView&&screen.project.id===active)||(dialog.open&&state.screen===screen)||screen.view.preserveViewOnClose,savedScroll=screen.scroll;
     clearTimeout(screen.timer);clearInterval(screen.poll);
     screen.ready=true;screen.failed=false;screen.el.classList.add('is-live');
     screen.el.dataset.readyAt=Math.round(performance.now());
     attachEscape(screen,doc);prepareDocument(screen,doc);deviceFor(screen)?.box.classList.add('is-live');
     if(state.screen===screen)updateStatus();
     scheduleRotation();
+    if(restoreSaved){
+      // A hidden iframe has no scrollable layout. Place it before restoring.
+      if(dialog.open)layoutViewer();else layoutThumbnails();
+      screen.scroll=savedScroll;
+      restoreScroll(screen);
+      requestAnimationFrame(()=>{if(version===screen.version&&!rotation.started)restoreScroll(screen);});
+    }
     if(dialog.open&&state.screen===screen)screen.presentation?.run({cursor:false});
   }
   function loadScreen(screen) {
@@ -257,7 +264,11 @@
       modes.forEach(mode=>wanted.add(getScreen(registry.get(active),mode)));
     }
     const changed=[...screens.values()].some(s=>!!s.frame!==wanted.has(s));
-    if(changed&&!dialog.open)restartTour({keepView:rotation.keepView});
+    if(changed&&!dialog.open){
+      // Keep the tour's position while its frames are released or re-created.
+      if(rotation.started){rotation.keepView=true;rotation.resuming=true;}
+      stopTour();rotation.started=false;
+    }
     // Release first, then load: switching never temporarily doubles memory.
     screens.forEach(s=>{if(!wanted.has(s))releaseScreen(s);});
     if(compactPreview()){
@@ -275,6 +286,7 @@
     screen.shell.style.transform=`scale(${scale})`;
   }
   function placeThumbnail(screen) {
+    rememberScroll(screen);
     const device=deviceFor(screen);
     if(!device){screen.el.hidden=true;return;}
     const box=rect(device.box),boundary=rect(device.box.closest('.landing-art,.scene-art'));
@@ -373,7 +385,7 @@
       shell.style.transform='none';rest.append(shell);device.box.prepend(rest);device.miniature=shell;
       device.box.classList.toggle('is-live',screen.ready);
     });
-    if(heroButton)heroButton.querySelector('span').textContent=`Разгледай ${project.name} на живо`;
+    if(heroButton){heroButton.querySelector('span').textContent='Натиснете екран за преглед';heroButton.setAttribute('aria-label',`${project.name} — отвори преглед`);}
     if(changed||rotation.project===null){restartTour();MODES.forEach(mode=>{const s=getScreen(project,mode);if(s.ready)resetPreview(s,true);});}
     layoutThumbnails();dispatchEvent(new CustomEvent('lumina:projectchange',{detail:{id,automatic}}));
     if(changed&&motion())MODES.forEach(mode=>{const s=getScreen(project,mode);if(!s.el.hidden)s.el.animate({opacity:[.35,1]},{duration:220});});
@@ -393,7 +405,7 @@
   }
   function restartTour({keepView=false}={}){
     stopTour();screens.forEach(s=>s.presentation?.stop());
-    rotation.project=active;rotation.elapsed=0;rotation.started=false;rotation.keepView=keepView;
+    rotation.project=active;rotation.elapsed=0;rotation.started=false;rotation.keepView=keepView;rotation.resuming=false;
     document.body.dataset.previewTour='loading';
   }
   function canTour(){return registry.size>1&&!rotation.paused&&!rotation.holds.size&&!dialog.open&&!document.hidden;}
@@ -405,14 +417,14 @@
     if(current.some(s=>s.resettingHome))return false;
     current.forEach(s=>{
       try{
-        const win=s.frame.contentWindow;s.tourStart=win.scrollY;
+        const win=s.frame.contentWindow;if(!rotation.resuming)s.tourStart=win.scrollY;
         // Decode the rest of this page during its opening hold, before the tour
         // reaches it. Inactive projects retain their own lazy-loading behavior.
         if(!compactPreview())win.document.querySelectorAll('img[loading=lazy]').forEach(img=>{img.loading='eager';});
       }catch{s.tourStart=0;}
       if(!rotation.keepView)s.presentation?.run();
     });
-    rotation.started=true;return true;
+    rotation.started=true;rotation.resuming=false;return true;
   }
   function tourFrame(now){
     rotation.frame=0;
@@ -488,13 +500,15 @@
     ],{duration,easing:EASE});
   }
   function rememberScroll(screen) {
+    // display:none browsing contexts report zero, not their last real position.
+    if(!screen.ready||!screen.frame?.getClientRects().length)return;
     try{const win=screen.frame.contentWindow;screen.scroll={x:win.scrollX,y:win.scrollY};}catch{}
   }
   function restoreScroll(screen) {
     try{const win=screen.frame.contentWindow;if(win.scrollX!==screen.scroll.x||win.scrollY!==screen.scroll.y)win.scrollTo({left:screen.scroll.x,top:screen.scroll.y,behavior:'instant'});}catch{}
   }
   function resetPreview(screen,forceTop=false) {
-    // A project's live phone can keep its view while Lumina returns home.
+    // Preserve a captured view unless a fresh project tour explicitly resets it.
     // Restore the captured position after native dialog focus restoration.
     if(screen.view.preserveViewOnClose&&!forceTop){restoreScroll(screen);return;}
     screen.scroll={x:0,y:0};
@@ -522,7 +536,7 @@
     state.source=devices.find(d=>d.button===opener)||deviceFor(state.screen);
     const source=state.source,from=source?rect(source.box):null;
     cancelAnimations();screens.forEach(s=>{s.presentation?.stop();rememberScroll(s);});
-    state.saved={overflow:document.documentElement.style.overflow,x:scrollX,y:scrollY,hash:location.hash,keepPlace:!!opener?.closest('#projects')||!!source?.scene};
+    state.saved={overflow:document.documentElement.style.overflow,x:scrollX,y:scrollY,hash:location.hash};
     document.documentElement.style.overflow='hidden';
     dialog.querySelector('#lp-title').textContent=state.project.name+' — преглед на сайта';
     dialog.inert=false;dialog.removeAttribute('aria-hidden');dialog.showModal();syncScreens();layoutViewer();V.close.focus({preventScroll:true});screens.forEach(restoreScroll);
@@ -536,19 +550,20 @@
     if(dialog.open||!state.project)return;
     ++state.seq;cancelAnimations();screens.forEach(s=>s.presentation?.stop());
     document.documentElement.style.overflow=state.saved.overflow;
-    const saved=state.saved,returnPosition=saved.keepPlace?{left:saved.x,top:saved.y}:{left:0,top:0};
+    const saved=state.saved,returnPosition={left:saved.x,top:saved.y};
     window.scrollTo({...returnPosition,behavior:'instant'});
     dialog.inert=true;dialog.setAttribute('aria-hidden','true');
     screens.forEach(s=>{s.el.classList.remove('is-selected');if(s.frame){s.frame.inert=true;s.frame.tabIndex=-1;s.frame.setAttribute('aria-hidden','true');}setThumbnail(s,true);});
     const opener=state.opener;state.project=null;state.screen=null;state.source=null;state.opener=null;state.closing=false;
-    const focusTarget=saved.keepPlace?opener:heroButton||opener;
-    focusTarget?.focus({preventScroll:true});
+    rotation.focusBypass=opener;
+    opener?.focus({preventScroll:true});
+    rotation.holds.delete('focus');rotation.holds.delete('project-tab');
     const closedVersion=state.seq;
     const resetLanding=()=>{
       if(dialog.open||state.seq!==closedVersion)return;
-      screens.forEach(s=>resetPreview(s));window.scrollTo({...returnPosition,behavior:'instant'});layoutThumbnails();
+      screens.forEach(restoreScroll);window.scrollTo({...returnPosition,behavior:'instant'});layoutThumbnails();
     };
-    history.replaceState(null,'',location.pathname+location.search+(saved.keepPlace?saved.hash:'#home'));
+    history.replaceState(history.state,'',location.pathname+location.search+saved.hash);
     resetLanding();
     // Native dialog focus restoration and scroll anchoring finish after close.
     requestAnimationFrame(()=>{resetLanding();requestAnimationFrame(()=>{resetLanding();restartTour({keepView:true});scheduleRotation();});});
@@ -596,8 +611,13 @@
   const rotationRegions=[document.querySelector('.landing-art'),document.querySelector('#projects .scene-art')].filter(Boolean);
   const visibleRegions=new Set();rotation.holds.add('offscreen');
   const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{entry.isIntersecting?visibleRegions.add(entry.target):visibleRegions.delete(entry.target);});holdRotation('offscreen',!visibleRegions.size);},{threshold:.05});rotationRegions.forEach(region=>observer.observe(region));
-  document.addEventListener('focusin',()=>{const el=document.activeElement;holdRotation('focus',!!el?.closest('.landing,#projects')&&!el.closest('.lp-rotation-controls'));});
-  document.addEventListener('focusout',()=>queueMicrotask(()=>{const el=document.activeElement;holdRotation('focus',!!el?.closest('.landing,#projects')&&!el.closest('.lp-rotation-controls'));}));
+  function updateFocusHold(){
+    const el=document.activeElement;
+    if(el!==rotation.focusBypass)rotation.focusBypass=null;
+    holdRotation('focus',el!==rotation.focusBypass&&!!el?.matches(':focus-visible')&&!!el.closest('.landing,#projects')&&!el.closest('.lp-rotation-controls'));
+  }
+  document.addEventListener('focusin',updateFocusHold);
+  document.addEventListener('focusout',()=>queueMicrotask(updateFocusHold));
   window.LuminaPreview=Object.freeze({register,select,open,close,setMode:switchMode,hold:holdRotation,next(){advance();},get active(){return active;},get projects(){return [...registry.keys()];}});
   select(active);
   // Other projects are loaded only when selected, never all twelve at startup.
