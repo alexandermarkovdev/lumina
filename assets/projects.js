@@ -30,7 +30,9 @@ window.LUMINA_PROJECTS = [
     hideInThumbnail: '.consent-bar',
     bookingSelector: '[data-nm-booking]',
     modes: {
-      desktop: { width: 1440, height: 900, poster: 'assets/previews/vsi-desktop.jpg' },
+      // Match the supplied full desktop composition: its side artwork scales
+      // with the space outside the site's 1280px content column.
+      desktop: { width: 1920, height: 1200, poster: 'assets/previews/vsi-desktop.jpg' },
       tablet: { width: 820, height: 1132, poster: 'assets/previews/vsi-tablet.jpg' },
       mobile: { width: 402, height: 778, poster: 'assets/previews/vsi-mobile.jpg' }
     }

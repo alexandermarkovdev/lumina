@@ -89,8 +89,19 @@
     setThumbnail(screen,!dialog.open||state.screen!==screen);
     if(!doc.getElementById('lumina-tour-style')){
       const style=doc.createElement('style');style.id='lumina-tour-style';
-      style.textContent='html[data-lumina-thumbnail],html[data-lumina-thumbnail] *{scroll-behavior:auto!important}';doc.head.append(style);
+      style.textContent=`html[data-lumina-thumbnail],html[data-lumina-thumbnail] *{scroll-behavior:auto!important}
+        html[data-lumina-thumbnail] *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+        html[data-lumina-thumbnail] .hero-pizza{filter:none!important}`;doc.head.append(style);
     }
+    screen.pageSize?.disconnect();
+    screen.tourGeometry={dirty:true,end:0,lastTop:null};
+    const invalidate=()=>{screen.tourGeometry.dirty=true;};
+    // Scroll extents change when content resizes, not on every camera frame.
+    screen.pageSize=new ResizeObserver(invalidate);
+    screen.pageSize.observe(doc.documentElement);
+    if(doc.body)screen.pageSize.observe(doc.body);
+    doc.addEventListener('load',invalidate,{capture:true,signal:screen.inside.signal});
+    doc.fonts?.ready.then(()=>{if(screen.frame?.contentDocument===doc)invalidate();});
     screen.presentation?.stop();
     screen.presentation=createPresentation(screen,doc);
     if(screen.project.hideInThumbnail&&!doc.getElementById('lumina-preview-adapter')){
@@ -203,7 +214,7 @@
   }
   function loadScreen(screen) {
     const version=++screen.version;
-    clearInterval(screen.poll);clearTimeout(screen.timer);screen.presentation?.stop();screen.inside?.abort();screen.frame?.remove();
+    clearInterval(screen.poll);clearTimeout(screen.timer);screen.presentation?.stop();screen.inside?.abort();screen.pageSize?.disconnect();screen.frame?.remove();
     screen.ready=false;screen.failed=false;screen.el.classList.remove('is-live');
     const frame=document.createElement('iframe');screen.frame=frame;
     frame.title=`${screen.project.name} — ${LABELS[screen.mode]}`;frame.allow='clipboard-write';
@@ -225,7 +236,7 @@
     frame.addEventListener('load',()=>{screen.resettingHome=false;screen.el.dataset.loads=String(Number(screen.el.dataset.loads||0)+1);checking=false;check();});
     frame.addEventListener('error',fail);
     const url=new URL(screen.project.url,document.baseURI);
-    url.searchParams.set('lumina-revision',url.pathname.includes('/razor/')?'razor-smooth-10':'launch-3');
+    url.searchParams.set('lumina-revision','preview-core-27');
     if(screen.project.smoothTour&&!interactive)url.searchParams.set('lumina-thumbnail','1');
     if(screen.project.previewParam)url.searchParams.set(screen.project.previewParam,'1');
     frame.src=url.href;screen.display.append(frame);
@@ -253,7 +264,7 @@
     if(!screen.frame)return;
     rememberScroll(screen);++screen.version;
     clearInterval(screen.poll);clearTimeout(screen.timer);
-    screen.presentation?.stop();screen.presentation=null;screen.inside?.abort();
+    screen.presentation?.stop();screen.presentation=null;screen.inside?.abort();screen.pageSize?.disconnect();screen.tourGeometry=null;
     screen.frame.remove();screen.frame=null;screen.ready=false;screen.failed=false;screen.resettingHome=false;
     screen.el.classList.remove('is-live');
   }
@@ -419,6 +430,7 @@
     current.forEach(s=>{
       try{
         const win=s.frame.contentWindow;if(!rotation.resuming)s.tourStart=win.scrollY;
+        if(s.tourGeometry){s.tourGeometry.dirty=true;s.tourGeometry.lastTop=null;}
         // Decode the rest of this page during its opening hold, before the tour
         // reaches it. Inactive projects retain their own lazy-loading behavior.
         if(!compactPreview())win.document.querySelectorAll('img[loading=lazy]').forEach(img=>{img.loading='eager';});
@@ -431,13 +443,9 @@
     rotation.frame=0;
     if(!canTour()){stopTour();return;}
     if(!rotation.started&&!beginTour()){document.body.dataset.previewTour='loading';return;}
-    if(rotation.last)rotation.elapsed+=now-rotation.last;
+    // A delayed frame should slow the camera briefly, not jump over content.
+    if(rotation.last)rotation.elapsed+=Math.min(now-rotation.last,50);
     rotation.last=now;
-    // Razor's long page needs smaller scroll steps. Its lightweight thumbnail
-    // assets allow 60fps; retain the existing 30fps limit for other mobile tours.
-    const minFrame=registry.get(active).smoothTour?16:compactPreview()?32:0;
-    if(rotation.painted&&now-rotation.painted<minFrame){rotation.frame=requestAnimationFrame(tourFrame);return;}
-    rotation.painted=now;
     const hold=registry.get(active).presentation==='jtn-doors'?4800:1800;
     const progress=Math.max(0,Math.min(1,(rotation.elapsed-hold)/(rotation.interval-hold-1000)));
     // A short acceleration/deceleration around an otherwise steady pan.
@@ -448,13 +456,20 @@
     screens.forEach(s=>{
       if(s.project.id!==active||!s.ready)return;
       try{
-        const win=s.frame.contentWindow,root=win.document.scrollingElement;
-        const end=Math.max(0,root.scrollHeight-win.innerHeight),start=Math.min(s.tourStart||0,end);
-        scrolls.push({win,top:start+(end-start)*p});
+        const win=s.frame.contentWindow,geometry=s.tourGeometry;
+        if(!geometry)return;
+        if(geometry.dirty){
+          geometry.end=Math.max(0,win.document.scrollingElement.scrollHeight-s.view.height);
+          geometry.dirty=false;
+        }
+        const end=geometry.end,start=Math.min(s.tourStart||0,end);
+        const top=Math.round(start+(end-start)*p);
+        // No redundant scroll events during the intro/footer holds.
+        if(top!==geometry.lastTop)scrolls.push({win,top,geometry});
       }catch{}
     });
     // Finish layout reads in every document before moving any viewport.
-    scrolls.forEach(({win,top})=>win.scrollTo({left:0,top,behavior:'instant'}));
+    scrolls.forEach(({win,top,geometry})=>{win.scrollTo({left:0,top,behavior:'instant'});geometry.lastTop=top;});
     if(rotation.elapsed>=rotation.interval){advance(1,true);return;}
     rotation.frame=requestAnimationFrame(tourFrame);
   }
@@ -621,21 +636,18 @@
   V.close.addEventListener('click',close);V.backdrop.addEventListener('click',close);
   V.failure.querySelector('button').addEventListener('click',()=>{if(!state.closing){loadScreen(state.screen);layoutViewer();}});
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});dialog.addEventListener('close',cleanup);
-  addEventListener('resize',()=>{syncScreens();queueLayout();scheduleRotation();});addEventListener('scroll',()=>{if(!dialog.open)queueLayout();},{passive:true});addEventListener('load',queueLayout);document.fonts?.ready.then(queueLayout);
+  addEventListener('resize',()=>{syncScreens();queueLayout();scheduleRotation();});addEventListener('load',queueLayout);document.fonts?.ready.then(queueLayout);
   // Content changes can move a device without resizing the device itself.
   const pageContent=document.querySelector('main');
   if(pageContent)new ResizeObserver(queueLayout).observe(pageContent);
-  let parentScrollTimer;
-  addEventListener('scroll',()=>{
-    if(dialog.open||!compactPreview())return;
-    if(!rotation.holds.has('parent-scroll'))holdRotation('parent-scroll',true);
-    clearTimeout(parentScrollTimer);parentScrollTimer=setTimeout(()=>holdRotation('parent-scroll',false),180);
-  },{passive:true});
+  // Closed previews and their photographed anchors share document coordinates;
+  // they move together natively. Scrolling the parent needs no geometry writes
+  // or stop/restart cycle. Reposition only when the visible showcase changes.
   document.addEventListener('visibilitychange',scheduleRotation);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches){rotation.paused=true;scheduleRotation();}});
   const rotationRegions=[document.querySelector('.landing-art'),document.querySelector('#projects .scene-art')].filter(Boolean);
   const visibleRegions=new Set();rotation.holds.add('offscreen');
-  const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{entry.isIntersecting?visibleRegions.add(entry.target):visibleRegions.delete(entry.target);});holdRotation('offscreen',!visibleRegions.size);},{threshold:.05});rotationRegions.forEach(region=>observer.observe(region));
+  const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{entry.isIntersecting?visibleRegions.add(entry.target):visibleRegions.delete(entry.target);});queueLayout();holdRotation('offscreen',!visibleRegions.size);},{threshold:.05});rotationRegions.forEach(region=>observer.observe(region));
   function updateFocusHold(){
     const el=document.activeElement;
     if(el!==rotation.focusBypass)rotation.focusBypass=null;
